@@ -1,8 +1,12 @@
+import { useState } from "react";
 import Card from "../components/card";
 import Footer from "../components/footer";
 import Header from "../components/header";
 
+
 export default function Interviewer_Home() {
+  const [isNewInterviews, setIsNewInterviews] = useState(true);
+
   return (
     <>
       <Header />
@@ -17,19 +21,26 @@ export default function Interviewer_Home() {
         </div>
         <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-xl overflow-hidden sm:flex sm:w-[40rem]">
           <li className="w-full focus-within:z-10">
-            <a href="#" className="inline-block w-full p-4 text-gray-900 bg-light-blue border-r border-white rounded-s-lg focus:ring-4 focus:ring-blue-300 active focus:outline-none" aria-current="page">New Interviews</a>
+            <button href="#" className={`inline-block w-full p-4  border-r border-white rounded-s-lg hover:text-gray-700  focus:outline-none ${isNewInterviews ? 'bg-light-blue text-gray-900' : 'bg-gray-100'}`} aria-current="page" onClick={() => setIsNewInterviews(true)}>New Interviews</button>
           </li>
           <li className="w-full focus-within:z-10">
-            <a href="#" className="inline-block w-full p-4 bg-gray-100 border-white hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:ring-blue-300 focus:outline-none">Scheduled Interviews</a>
+            <button href="#" className={`inline-block w-full p-4 bg-gray-100 border-white hover:text-gray-700  focus:outline-none ${!isNewInterviews ? 'bg-light-blue text-gray-900' : 'bg-gray-100'}`} onClick={() => setIsNewInterviews(false)}>Scheduled Interviews</button>
           </li>
         </ul>
       </div>
 
 
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-12 px-48 pb-32">
-        <Card />
-        <Card />
-      </section>
+      {isNewInterviews ?
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-10 px-48 pb-32">
+          <Card />
+          <Card />
+        </section>
+        :
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-10 px-48 pb-32">
+          <Card />
+          <Card />
+          <Card />
+        </section>}
 
       <Footer />
     </>

@@ -7,6 +7,7 @@ export default {
         "primary-blue": "#0154a5",
         "light-blue": "#e6f0fa",
         "dark-blue": "#041925",
+        "teal-blue": "#113f67",
       },
     },
   },
