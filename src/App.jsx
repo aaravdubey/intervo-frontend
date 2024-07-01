@@ -17,56 +17,71 @@ import JoinScreen from './pages/JoinScreen.jsx';
 
 const App = () => {
   const [meetingId, setMeetingId] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  //Getting the meeting id by calling the api we just wrote
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await getToken();
+        setAuthToken(token);
+      } catch (error) {
+        console.error("Failed to fetch token:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!authToken) fetchToken();
+  }, [authToken]);
+
   const getMeetingAndToken = async (id) => {
-    const authToken = await getToken();
-    
     const meetingId =
       id == null ? await createMeeting({ token: authToken }) : id;
     setMeetingId(meetingId);
   };
 
-  //This will set Meeting Id to null when meeting is left or ended
   const onMeetingLeave = () => {
     setMeetingId(null);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <>
-      <MeetingProvider
-        config={{
-          meetingId,
-          micEnabled: true,
-          webcamEnabled: true,
-          name: "Aarav's Org",
-        }}
-        token={authToken}
-      >
-        <BrowserRouter>
-          <Routes>
-            <Route index path='/login' element={<Login />} />
-            <Route index path='*' element={<Interviewer_Home />} />
-            <Route index path='/interview' element={<InterviewPage />} />
-            <Route index path='/meeting' element={authToken && meetingId ? (
-              <MeetingProvider
-                config={{
-                  meetingId,
-                  micEnabled: true,
-                  webcamEnabled: true,
-                  name: "User X",
-                }}
-                token={authToken}
-              >
-                <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
-              </MeetingProvider>
-            ) : (
-              <JoinScreen getMeetingAndToken={getMeetingAndToken} />
-            )} />
-          </Routes>
-        </BrowserRouter>
-      </MeetingProvider>
-    </>
+    <MeetingProvider
+      config={{
+        meetingId,
+        micEnabled: true,
+        webcamEnabled: true,
+        name: "Aarav's Org",
+      }}
+      token={authToken}
+    >
+      <BrowserRouter>
+        <Routes>
+          <Route index path='/login' element={<Login />} />
+          <Route index path='*' element={<Interviewer_Home />} />
+          <Route index path='/interview' element={<InterviewPage />} />
+          <Route index path='/meeting' element={authToken && meetingId ? (
+            <MeetingProvider
+              config={{
+                meetingId,
+                micEnabled: true,
+                webcamEnabled: true,
+                name: "User X",
+              }}
+              token={authToken}
+            >
+              <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
+            </MeetingProvider>
+          ) : (
+            <JoinScreen getMeetingAndToken={getMeetingAndToken} />
+          )} />
+        </Routes>
+      </BrowserRouter>
+    </MeetingProvider>
   );
 };
 

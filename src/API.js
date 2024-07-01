@@ -18,7 +18,8 @@ export const createMeeting = async () => {
 };
 
 export const getToken = async () => {
-  const response = await axios.post(`${import.meta.env.SERVER_ENDPOINT}meeting/getAuthKey`);
-  const token = response.data?.token;
+  const response = await axios.post(`http://localhost:3000/meeting/getAuthKey`);
+  // console.log(response.data);
+  const token = response.data;
   return token;
 }
