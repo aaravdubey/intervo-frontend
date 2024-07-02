@@ -1,6 +1,6 @@
 import React from 'react'
 
-import InterviewBatchCard from '../components/InterviewBatchCard '
+import InterviewBatchCard from '../components/InterviewBatchCard'
 
 export const BatchCard = () => {
   return (
@@ -8,7 +8,7 @@ export const BatchCard = () => {
       
     </div>
     <div>
-      <InterviewBatchCard/>   
+        <InterviewBatchCard/>
         </div>
         </>
    
