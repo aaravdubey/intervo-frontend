@@ -5,31 +5,11 @@ export default function DisplayDetails() {
   const location = useLocation();
   const [details, setDetails] = useState(null);
 
-  const sampleData = [
-    {
-      id: 1,
-      testTime: '2024-07-01 10:00 AM',
-      interviewTime: '2024-07-02 02:00 PM',
-      status: 'Pending',
-      score: null,
-      interviewer: 'John Doe',
-    },
-    {
-      id: 2,
-      testTime: '2024-07-03 11:00 AM',
-      interviewTime: '2024-07-04 03:00 PM',
-      status: 'Completed',
-      score: 85,
-      interviewer: 'Jane Smith',
-    },
-  ];
-
   useEffect(() => {
-    const cardDetails = sampleData.find(card => card.id === 1);
-    if (cardDetails) {
-      setDetails(cardDetails);
+    if (location.state && location.state.details) {
+      setDetails(location.state.details);
     }
-  }, []);
+  }, [location.state]);
 
   return (
     <>
