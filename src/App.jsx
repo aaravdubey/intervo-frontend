@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css'
 
 import Login from './Pages/Login';
-import DashBoard from './Pages/DashBoard';
+
 import ScheduledInterview from './Pages/ScheduledInterview';
 import Rounds from './Pages/Rounds';
 
