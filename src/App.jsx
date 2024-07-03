@@ -37,7 +37,7 @@ const App = () => {
 
   const getMeetingAndToken = async (id) => {
     const meetingId =
-      id == null ? await createMeeting({ token: authToken }) : id;
+      id == null ? await createMeeting( authToken ) : id;
     setMeetingId(meetingId);
   };
 

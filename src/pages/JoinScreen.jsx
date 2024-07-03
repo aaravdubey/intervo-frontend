@@ -1,12 +1,112 @@
+import { useEffect } from "react";
 import { useState } from "react";
+import { useMediaDevice } from "@videosdk.live/react-sdk";
+import Header from "../components/header";
+import { IoMicOffOutline, IoMicOutline } from "react-icons/io5";
+import { IoVideocamOffOutline, IoVideocamOutline } from "react-icons/io5";
+import { GiSoundWaves } from "react-icons/gi";
+import { useRef } from "react";
+
+
 
 export default function JoinScreen({ getMeetingAndToken }) {
   const [meetingId, setMeetingId] = useState(null);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [isMicOn, setIsMicOn] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const dataArrayRef = useRef(null);
+  const { checkPermissions, requestPermission, getCameras, getMicrophones, getPlaybackDevices } = useMediaDevice();
+
   const onClick = async () => {
     await getMeetingAndToken(meetingId);
   };
+
+  const requestAudioVideoPermission = async () => {
+    try {
+      const checkAudioVideoPermission = await checkPermissions("audio_video");
+      let requestAudioVideoPermission;
+      if (checkAudioVideoPermission) {
+        requestAudioVideoPermission = await requestPermission("audio_video");
+        let webcams = await getCameras();
+        let mics = await getMicrophones();
+        let speakers = await getPlaybackDevices();
+      }
+      return requestAudioVideoPermission.get('audio_video');
+    } catch (ex) {
+      console.log("Error in requestPermission ", ex);
+    }
+  };
+
+  const toggleCamera = async () => {
+    if (requestAudioVideoPermission && isCameraOn == false) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        setIsCameraOn(true);
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+      }
+    } else {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      videoRef.current.srcObject = null;
+      setIsCameraOn(false);
+    }
+  }
+
+  const toggleMic = async () => {
+    if (requestAudioVideoPermission && isMicOn == false) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        dataArrayRef.current = dataArray;
+        setIsMicOn(true);
+
+        const updateMicLevel = () => {
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            sum += dataArray[i];
+          }
+          const average = sum / bufferLength;
+          setMicLevel(average);
+          requestAnimationFrame(updateMicLevel);
+        };
+
+        updateMicLevel();
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+      }
+    } else {
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      setMicLevel(0);
+      setIsMicOn(false);
+    }
+  }
+
+  useEffect(() => {
+    requestAudioVideoPermission();
+  }, []);
+
   return (
-    <div>
+    <div className="flex flex-col h-svh">
+      <Header />
       <input
         type="text"
         placeholder="Enter Meeting Id"
@@ -14,9 +114,43 @@ export default function JoinScreen({ getMeetingAndToken }) {
           setMeetingId(e.target.value);
         }}
       />
-      <button onClick={onClick}>Join</button>
-      {" or "}
-      <button onClick={onClick}>Create Meeting</button>
+
+
+      <div>
+        <p></p>
+      </div>
+
+      <div className="w-full h-full flex items-center justify-center gap-14 px-28">
+        <div className="relative w-3/5 h-[70%]">
+          <video ref={videoRef} className="w-full h-full bg-gray-900 rounded-lg object-cover" autoPlay muted />
+
+          {!isCameraOn && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-white text-xl">Camera is off</p>
+            </div>
+          )}
+          <div className="absolute inset-0 flex items-end justify-center gap-3 mb-3">
+            <button className={isMicOn ? "bg-white text-primary-blue rounded-full p-5 text-2xl" : "bg-primary-blue text-white rounded-full p-5 text-2xl"} onClick={toggleMic}>{isMicOn ? <IoMicOutline /> : <IoMicOffOutline />}</button>
+            <button className={isCameraOn ? "bg-white text-primary-blue rounded-full p-5 text-2xl" : "bg-primary-blue text-white rounded-full p-5 text-2xl"} onClick={toggleCamera}>{isCameraOn ? <IoVideocamOutline /> : <IoVideocamOffOutline />}</button>
+            <div className="absolute start-0 flex justify-start items-center gap-2 mb-2 ml-5 bg-white rounded-full p-1">
+              <IoMicOutline className={isMicOn ? "text-primary-blue" : "text-gray-400"} />
+              <div className="min-w-40 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary-blue rounded-full"
+                  style={{ width: `${micLevel}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+        <div className="w-2/5">
+          <p className="text-xl font-semibold mb-5">TCS Python Developers Recruitment 2024 Interview</p>
+          <button onClick={onClick} className="block bg-primary-blue text-white w-full p-2 rounded">Join</button>
+        </div>
+      </div>
     </div>
   );
 }

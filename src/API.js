@@ -3,7 +3,8 @@ import axios from "axios";
 export const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiI3NmIwMzE3YS03ZDI5LTQ4MjMtODY5NC0zNTFiNTEzZmIyOTYiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcxOTY2MjU5OSwiZXhwIjoxNzE5NzQ4OTk5fQ.k2pSmk2n4u9EmBQm2xxStbBmUYFvXp6sWwY-kaMFx5g";
 // This is the Auth token, you will use it to generate a meeting and connect to it
 // API call to create a meeting
-export const createMeeting = async () => {
+
+export const createMeeting = async (authToken) => {
   const res = await fetch(`https://api.videosdk.live/v2/rooms`, {
     method: "POST",
     headers: {

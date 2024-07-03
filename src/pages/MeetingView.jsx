@@ -2,6 +2,7 @@ import { useState } from "react";
 import Controls from "../components/Controls";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import ParticipantView from "../components/ParticipantView";
+import { useEffect } from "react";
 
 export default function MeetingView(props) {
   const [joined, setJoined] = useState(null);
@@ -22,6 +23,12 @@ export default function MeetingView(props) {
     join();
   };
 
+  useEffect(() => {
+    if (props.meetingId) {
+      joinMeeting();
+    }
+  }, [])
+
   return (
     <div className="container">
       <h3>Meeting Id: {props.meetingId}</h3>
@@ -36,11 +43,9 @@ export default function MeetingView(props) {
             />
           ))}
         </div>
-      ) : joined && joined == "JOINING" ? (
+      ) :
         <p>Joining the meeting...</p>
-      ) : (
-        <button onClick={joinMeeting}>Join</button>
-      )}
+      }
     </div>
   );
 }
