@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import InterviewCard from '../components/card.jsx';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
+import { Link } from 'react-router-dom';
 
 export default function ScheduledInterview() {
   const [details, setDetails] = useState(null);
@@ -66,16 +67,18 @@ export default function ScheduledInterview() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <h2 className="text-xl font-bold mb-4">Details for Card {details.id}</h2>
+            <h2 className="text-xl font-bold mb-4">Details for Interview</h2>
             <p><strong>Test Time:</strong> {details.testTime}</p>
             <p><strong>Interview Time:</strong> {details.interviewTime}</p>
             <p><strong>Status:</strong> {details.status}</p>
             <p><strong>Score:</strong> {details.score !== null ? details.score : 'N/A'}</p>
             <p><strong>Interviewer:</strong> {details.interviewer}</p>
             <div className="mt-4">
-              <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2" onClick={() => alert('Test scheduled')}>
-                Schedule Test
+              <Link to='/rounds'>
+              <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2" >
+                Schedule Aptitude
               </button>
+              </Link>
               <button className="bg-green-500 text-white font-bold py-2 px-4 rounded" onClick={() => alert('Interview scheduled')}>
                 Schedule Interview
               </button>
