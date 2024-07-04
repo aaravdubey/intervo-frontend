@@ -14,14 +14,13 @@ export default function UserValidation() {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [isCaptured, setIsCaptured] = useState(false);
+    const [faceDetected, setFaceDetected] = useState(false); // Track if a face is detected
 
     useEffect(() => {
         const loadModels = async () => {
             try {
-                await faceapi.nets.tinyFaceDetector.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/tiny_face_detector_model-weights_manifest.json');
-
-                await faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/face_recognition_model-weights_manifest.json');
-
+                // Load face detection model
+                await faceapi.nets.tinyFaceDetector.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
 
                 console.log('Models loaded');
             } catch (error) {
@@ -59,19 +58,20 @@ export default function UserValidation() {
     const handleVideoPlay = () => {
         setInterval(async () => {
             if (videoRef.current && canvasRef.current) {
-                const detections = await faceapi.detectAllFaces(
+                const detection = await faceapi.detectSingleFace(
                     videoRef.current,
                     new faceapi.TinyFaceDetectorOptions()
-                ).withFaceLandmarks();
+                );
 
                 const canvas = canvasRef.current;
                 const displaySize = { width: videoRef.current.width, height: videoRef.current.height };
                 faceapi.matchDimensions(canvas, displaySize);
 
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-                faceapi.draw.drawDetections(canvas, resizedDetections);
-                faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+                if (detection) {
+                    setFaceDetected(true); // Set state to true if face is detected
+                } else {
+                    setFaceDetected(false); // Set state to false if no face detected
+                }
             }
         }, 100);
     };
@@ -218,8 +218,9 @@ export default function UserValidation() {
                                     Re-Capture Your Face
                                 </button>
                                 <button
-                                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                                    onClick={isCaptured ? null : captureImage}
+                                    className={`px-4 py-2 bg-blue-500 text-white rounded ${faceDetected ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                    onClick={faceDetected ? captureImage : null}
+                                    disabled={!faceDetected} // Disable button if no face detected
                                 >
                                     {isCaptured ? 'Proceed' : 'Capture Your Face'}
                                 </button>
