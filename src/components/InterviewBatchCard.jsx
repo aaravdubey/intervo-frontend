@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import InterviewIcon from "../assets/logo.png";
+import InterviewIcon from "../assets/interview-icon.png";
 
 const InterviewBatchCard = () => {
   const [interviewBatches, setInterviewBatches] = useState([]);
@@ -37,7 +37,7 @@ const InterviewBatchCard = () => {
   }
 
   return (
-    <div className="flex flex-wrap justify-center gap-4">
+    <div className="flex flex-wrap justify-center gap-4 ">
       <h2 className="text-3xl font-bold text-center my-8">Interview Batches</h2>
       <div className="w-full mb-8"></div>
       {interviewBatches.length === 0 && (
@@ -46,40 +46,35 @@ const InterviewBatchCard = () => {
       {interviewBatches.map((batch, index) => (
         <div
           key={index}
-          className="max-w-sm rounded-lg overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+          className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
         >
-          <div className="px-6 py-4">
+          <a href="#">
             <img
-              className="w-full h-32 object-cover mb-4 rounded-md"
-              src={InterviewIcon}
-              alt="Interview Icon"
+              className="rounded saturate-50 w-full h-48 object-cover"
+              src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267"
+              alt="Interview Batch"
             />
-            <div className="font-bold text-xl mb-2">{batch.companyName}</div>
-            <p className="text-gray-700 text-base mb-2">
-              Total Candidates Required: {batch.totalCandidatesRequired}
-            </p>
-            <p className="text-gray-700 text-base mb-2">Domains: {batch.domains}</p>
-            <p className="text-gray-700 text-base mb-2">
-              Skills: {batch.skills.join(", ")}
-            </p>
-            <p className="text-gray-700 text-base mb-2">
-              Interview Types: {batch.interviewTypes.join(", ")}
-            </p>
-            <p className="text-gray-700 text-base mb-2">
-              Deadline: {new Date(batch.deadline).toLocaleDateString()}
-            </p>
+          </a>
+          <div className="py-5 px-2">
+            <a href="#">
+              <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">{batch.companyName}</h5>
+            </a>
+            <p className="mb-1 font-normal text-sm text-gray-700">Total Candidates Required: {batch.totalCandidatesRequired}</p>
+            <p className="mb-1 font-normal text-sm text-gray-700">Domains: {batch.domains}</p>
+            <p className="mb-1 font-normal text-sm text-gray-700">Skills: {batch.skills.join(", ")}</p>
+            <p className="mb-1 font-normal text-sm text-gray-700">Interview Types: {batch.interviewTypes.join(", ")}</p>
+            <p className="mb-1 font-normal text-sm text-gray-700">Deadline: {new Date(batch.deadline).toLocaleDateString()}</p>
             {batch.note && (
-              <p className="text-gray-700 text-base mb-2">
-                Note: {batch.note}
-              </p>
+              <p className="mb-1 font-normal text-sm text-gray-700">Note: {batch.note}</p>
             )}
             {batch.csvFile && (
               <a
                 href={`data:text/csv;base64,${batch.csvFile}`}
                 download={`${batch.companyName}_interview_batch.csv`}
-                className="inline-block bg-indigo-500 hover:text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out"
+                className="inline-flex items-center px-4 py-2.5 text-sm font-medium text-center text-white bg-primary-blue rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
               >
                 Download CSV
+                <img src={InterviewIcon} className="ml-2 h-6" alt="Interview Icon" />
               </a>
             )}
           </div>

@@ -2,6 +2,7 @@ import React from 'react'
 
 import InterviewBatchCard from '../components/InterviewBatchCard'
 
+
 export const BatchCard = () => {
   return (
     <> <div>
@@ -9,8 +10,10 @@ export const BatchCard = () => {
     </div>
     <div>
         <InterviewBatchCard/>
+      
         </div>
         </>
    
   )
 }
+
