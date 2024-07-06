@@ -20,7 +20,7 @@ export default function InterviewPage() {
         <p className="text-xl font-semibold mt-14">Interview Meeting(s)</p>
         <div className="flex gap-12">
           <div className="mt-2 text-sm text-gray-600 flex items-center gap-5 border p-4 rounded-lg leading-6">
-            <img src={InterviewImg} alt="Interview" className="w-20 h-20 opacity-90 " />
+            <img src={InterviewImg} alt="Interview" className="w-20 h-20" />
             <div className="flex flex-col">
               <span className="text-teal-blue font-semibold text-lg">Meeting 1</span>
               <span>14 candidates</span>
@@ -29,7 +29,7 @@ export default function InterviewPage() {
             </div>
           </div>
           <div className="mt-2 text-sm text-gray-600 flex items-center gap-5 border p-4 rounded-lg leading-6">
-            <img src={InterviewImg} alt="Interview" className="w-20 h-20 opacity-90 " />
+            <img src={InterviewImg} alt="Interview" className="w-20 h-20" />
             <div className="flex flex-col">
               <span className="text-teal-blue font-semibold text-lg">Meeting 2</span>
               <span>8 candidates</span>
@@ -66,7 +66,7 @@ export default function InterviewPage() {
                 <th className="px-3 py-5 w-1/6">Interview Score</th>
               </tr>
             </thead>
-            <tbody className="bg-grey-light flex flex-col items-center justify-between overflow-y-scroll w-full h-48 bg-slate-50">
+            <tbody className="bg-grey-light flex flex-col items-center justify-between overflow-y-scroll w-full h-64 bg-slate-50">
               <tr className="flex w-full border-b border-gray-300">
                 <td className="px-3 py-5 w-1/6">1</td>
                 <td className="px-3 py-5 pl-4 w-1/6">XYZ</td>

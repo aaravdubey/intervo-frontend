@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useMemo } from "react";
 import { useRef } from "react";
 import ReactPlayer from "react-player";
+import { IoMicOffOutline, IoMicOutline } from "react-icons/io5";
+import { IoVideocamOffOutline, IoVideocamOutline } from "react-icons/io5";
 
 export default function ParticipantView(props) {
   const micRef = useRef(null);
@@ -36,31 +38,39 @@ export default function ParticipantView(props) {
   }, [micStream, micOn]);
 
   return (
-    <div>
-      <p>
-        Participant: {displayName} | Webcam: {webcamOn ? "ON" : "OFF"} | Mic:{" "}
-        {micOn ? "ON" : "OFF"}
-      </p>
+    <div className={`relative ${props.count != 1 ? 'w-full' : 'xl:mx-32'} flex justify-center rounded-lg overflow-hidden`}>
       <audio ref={micRef} autoPlay playsInline muted={isLocal} />
-      {webcamOn && (
-        <ReactPlayer
-          //
-          playsinline // extremely crucial prop
-          pip={false}
-          light={false}
-          controls={false}
-          muted={true}
-          playing={true}
-          //
-          url={videoStream}
-          //
-          height={"300px"}
-          width={"300px"}
-          onError={(err) => {
-            console.log(err, "participant video error");
-          }}
-        />
-      )}
+      {webcamOn ? (
+        <>
+          <p className="absolute top-2 left-2 flex items-center gap-2 bg-black bg-opacity-40 rounded-lg py-1 px-3 text-white">
+            {!micOn && <IoMicOffOutline className="text-red-700" />} {!webcamOn && <IoVideocamOffOutline className="text-red-700" />} {displayName}
+          </p>
+          <ReactPlayer
+            //
+            playsinline // extremely crucial prop
+            pip={false}
+            light={false}
+            controls={false}
+            muted={true}
+            playing={true}
+            //
+            url={videoStream}
+            //
+            height={""}
+            width={"100%"}
+            onError={(err) => {
+              console.log(err, "participant video error");
+            }}
+          />
+        </>
+      ) : (<>
+        <div className="min-h-full flex flex-col gap-5 items-center justify-center">
+          <p className="text-white text-8xl font-semibold bg-gray-800 px-16 py-12 rounded-full">{displayName[0]}</p>
+          <p className="flex items-center gap-2 bg-black bg-opacity-40 rounded-lg py-1 px-3 text-white">
+            {!micOn && <IoMicOffOutline className="text-red-700" />} {!webcamOn && <IoVideocamOffOutline className="text-red-700" />} {displayName}
+          </p>
+        </div>
+      </>)}
     </div>
   );
 }

@@ -1,13 +1,16 @@
+import { useNavigate } from "react-router";
 import Logo from "../assets/logo.png";
 
 export default function Header() {
+  const navigate = useNavigate();
+
   return (
     <header>
       <nav className="bg-white border-b border-gray-200 py-2.5">
         <div className="flex flex-wrap justify-between items-center mx-10 ">
-          <a href="#" className="flex items-center">
+          <button onClick={() => navigate("/")} className="flex items-center">
             <img src={Logo} className="mr-3 h-6 sm:h-16" alt="Flowbite Logo" />
-          </a>
+          </button>
           <div className="flex items-center lg:order-2">
             <a href="#" className="text-white bg-primary-blue  hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2">Login / Signup</a>
             <button data-collapse-toggle="mobile-menu-2" type="button" className="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="mobile-menu-2" aria-expanded="false">

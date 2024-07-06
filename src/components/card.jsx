@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router";
 import InterviewIcon from "../assets/interview-icon.png";
 import { IoPersonSharp } from "react-icons/io5";
 
 export default function Card() {
+  const navigate = useNavigate();
+
   return (
-    <div className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
+    <div onClick={() => navigate('/interview')} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
       <a href="#">
         <img className="rounded saturate-50" src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267" alt="" />
       </a>

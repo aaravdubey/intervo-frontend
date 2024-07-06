@@ -4,7 +4,6 @@ import { useMediaDevice } from "@videosdk.live/react-sdk";
 import Header from "../components/header";
 import { IoMicOffOutline, IoMicOutline } from "react-icons/io5";
 import { IoVideocamOffOutline, IoVideocamOutline } from "react-icons/io5";
-import { GiSoundWaves } from "react-icons/gi";
 import { useRef } from "react";
 
 
@@ -148,7 +147,7 @@ export default function JoinScreen({ getMeetingAndToken }) {
 
         <div className="w-2/5">
           <p className="text-xl font-semibold mb-5">TCS Python Developers Recruitment 2024 Interview</p>
-          <button onClick={onClick} className="block bg-primary-blue text-white w-full p-2 rounded">Join</button>
+          <button onClick={onClick} className="block bg-primary-blue text-white w-full p-2 rounded-lg font-semibold">Join</button>
         </div>
       </div>
     </div>

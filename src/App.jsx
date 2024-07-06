@@ -3,7 +3,6 @@ import './App.css';
 import Login from './pages/Login';
 import Interviewer_Home from './pages/Interviewer_Home';
 import InterviewPage from './pages/InterviewPage';
-import VideoMeet from './pages/VideoMeet';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   MeetingProvider,
