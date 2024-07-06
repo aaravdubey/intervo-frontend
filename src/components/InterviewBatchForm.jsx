@@ -109,138 +109,150 @@ const InterviewBatchForm = () => {
   ];
 
   return (
-    <div className="max-w-lg mx-auto p-8 mt-10 bg-white rounded-lg shadow-lg">
+    <div className="max-w-xxl mx-auto px-28 mt-10 bg-white rounded-lg shadow-lg ">
       <ToastContainer />
-      <h1 className="text-2xl font-bold mb-4">Interview Batch Form</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Company Name */}
-        <div className="mb-4">
-          <label htmlFor="companyName" className="block text-gray-700 font-bold mb-2">Company Name:</label>
-          <input
-            type="text"
-            id="companyName"
-            name="companyName"
-            value={formData.companyName}
-            readOnly
-            className="px-4 py-2 w-full bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Total Candidates Required */}
-        <div className="mb-4">
-          <label htmlFor="totalCandidatesRequired" className="block text-gray-700 font-bold mb-2">Total No. of Candidates Required:</label>
-          <input
-            type="number"
-            id="totalCandidatesRequired"
-            name="totalCandidatesRequired"
-            value={formData.totalCandidatesRequired}
-            onChange={handleInputChange}
-            placeholder="Enter Total No. of Candidates Required"
-            className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Domains */}
-        <div className="mb-4">
-          <label htmlFor="domains" className="block text-gray-700 font-bold mb-2">Domains:</label>
-          <input
-            type="text"
-            id="domains"
-            name="domains"
-            value={formData.domains}
-            onChange={handleInputChange}
-            placeholder="Enter Domains"
-            className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Skills */}
-        <div className="py-2 mb-4">
-          <span className="mb-2 text-md">Skills</span>
-          <div className='flex mb-2'>
+      <h1 className="text-2xl font-bold mb-4 ">Interview Batch Form</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Company Name */}
+          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label htmlFor="companyName" className="block text-gray-700 font-bold mb-2">Company Name:</label>
             <input
               type="text"
-              className="w-full p-2 border border-gray-300 rounded-s-md placeholder:font-light placeholder:text-gray-500"
-              name="domain"
-              id="domain"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ex: React, NodeJs, Python, etc."
+              id="companyName"
+              name="companyName"
+              value={formData.companyName}
+              readOnly
+              className="px-4 py-2 w-full bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
             />
-            <button className='bg-teal-blue text-white w-10 rounded-e-md' onClick={addTag}>+</button>
           </div>
-          <div className="flex flex-wrap">
-            {formData.skills.map((skill, index) => (
-              <div key={index} className="bg-gray-200 p-2 m-1 rounded-md flex items-center">
-                <span className="mr-2">{skill}</span>
-                <button type="button" className="text-red-500" onClick={() => removeTag(skill)}>x</button>
+
+          {/* Total Candidates Required */}
+          <div className="w-full md:w-1/2 px-3">
+            <label htmlFor="totalCandidatesRequired" className="block text-gray-700 font-bold mb-2">Total No. of Candidates Required:</label>
+            <input
+              type="number"
+              id="totalCandidatesRequired"
+              name="totalCandidatesRequired"
+              value={formData.totalCandidatesRequired}
+              onChange={handleInputChange}
+              placeholder="Enter Total No. of Candidates Required"
+              className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Domains */}
+          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label htmlFor="domains" className="block text-gray-700 font-bold mb-2">Domains:</label>
+            <input
+              type="text"
+              id="domains"
+              name="domains"
+              value={formData.domains}
+              onChange={handleInputChange}
+              placeholder="Enter Domains"
+              className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* Skills */}
+          <div className="w-full md:w-1/2 px-3">
+            <label htmlFor="skills" className="block text-gray-700 font-bold mb-2">Skills:</label>
+            <div className='flex mb-2'>
+              <input
+                type="text"
+                className="w-full p-2 border border-gray-300 rounded-l-md placeholder:font-light placeholder:text-gray-500"
+                name="skills"
+                id="skills"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Ex: React, NodeJs, Python, etc."
+              />
+              <button className='bg-teal-500 text-white w-10 rounded-r-md' onClick={addTag}>+</button>
+            </div>
+            <div className="flex flex-wrap">
+              {formData.skills.map((skill, index) => (
+                <div key={index} className="bg-gray-200 p-2 m-1 rounded-md flex items-center">
+                  <span className="mr-2">{skill}</span>
+                  <button type="button" className="text-red-500" onClick={() => removeTag(skill)}>x</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Interview Types and Deadline */}
+          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <span className="block text-gray-700 font-bold mb-2">Interview Types:</span>
+            {interviewTypes.map((type) => (
+              <div key={type.value} className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  id={type.value}
+                  value={type.value}
+                  checked={formData.interviewTypes.includes(type.value)}
+                  onChange={handleCheckboxChange}
+                  className="mr-2"
+                />
+                <label htmlFor={type.value} className="text-gray-700">{type.label}</label>
               </div>
             ))}
           </div>
+
+          {/* Deadline */}
+          <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <label htmlFor="deadline" className="block text-gray-700 font-bold mb-2">Deadline:</label>
+            <DatePicker
+              id="deadline"
+              selected={formData.deadline}
+              onChange={handleDateChange}
+              placeholderText="Select Deadline"
+              className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
         </div>
 
-        {/* Interview Types */}
-        <div className="mb-4">
-          <span className="block text-gray-700 font-bold mb-2">Interview Types:</span>
-          {interviewTypes.map((type) => (
-            <div key={type.value} className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id={type.value}
-                value={type.value}
-                checked={formData.interviewTypes.includes(type.value)}
-                onChange={handleCheckboxChange}
-                className="mr-2"
-              />
-              <label htmlFor={type.value} className="text-gray-700">{type.label}</label>
-            </div>
-          ))}
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Upload CSV File */}
+          <div className="w-full px-3 mb-6 md:mb-0">
+            <label htmlFor="csvFile" className="block text-gray-700 font-bold mb-2">Upload CSV File:</label>
+            <input
+              type="file"
+              id="csvFile"
+              name="csvFile"
+              onChange={handleFileChange}
+              className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
         </div>
 
-        {/* Deadline */}
-        <div className="mb-4">
-          <label htmlFor="deadline" className="block text-gray-700 font-bold mb-2">Deadline:</label>
-          <DatePicker
-            id="deadline"
-            selected={formData.deadline}
-            onChange={handleDateChange}
-            placeholderText="Select Deadline"
-            className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Upload CSV File */}
-        <div className="mb-4">
-          <label htmlFor="csvFile" className="block text-gray-700 font-bold mb-2">Upload CSV File:</label>
-          <input
-            type="file"
-            id="csvFile"
-            name="csvFile"
-            onChange={handleFileChange}
-            className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Note */}
-        <div className="mb-4">
-          <label htmlFor="note" className="block text-gray-700 font-bold mb-2">Note:</label>
-          <textarea
-            id="note"
-            name="note"
-            value={formData.note}
-            onChange={handleInputChange}
-            placeholder="Enter any additional notes"
-            className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-          />
+        <div className="flex flex-wrap -mx-3 mb-6">
+          {/* Note */}
+          <div className="w-full px-3 mb-6 md:mb-0">
+            <label htmlFor="note" className="block text-gray-700 font-bold mb-2">Note:</label>
+            <textarea
+              id="note"
+              name="note"
+              value={formData.note}
+              onChange={handleInputChange}
+              placeholder="Enter any additional notes"
+              className="px-4 py-2 w-full border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+            />
+          </div>
         </div>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-        >
-          Submit
-        </button>
+        <div className="flex justify-center mt-4">
+          <button
+            type="submit"
+            className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
