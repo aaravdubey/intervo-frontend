@@ -15,13 +15,14 @@ export default function UserValidation() {
     const canvasRef = useRef(null);
     const [isCaptured, setIsCaptured] = useState(false);
     const [faceDetected, setFaceDetected] = useState(false); // Track if a face is detected
+    const [capturedImage, setCapturedImage] = useState(null); // State to hold captured image data URL
+    const [idCardCapturedImage, setIdCardCapturedImage] = useState(null); // State to hold captured ID card image data URL
 
     useEffect(() => {
         const loadModels = async () => {
             try {
                 // Load face detection model
                 await faceapi.nets.tinyFaceDetector.loadFromUri('https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights');
-
                 console.log('Models loaded');
             } catch (error) {
                 console.error('Error loading models:', error);
@@ -32,7 +33,7 @@ export default function UserValidation() {
     }, []);
 
     useEffect(() => {
-        if (activeTab === 'webcam') {
+        if (activeTab === 'webcam' || activeTab === 'idCard') {
             startVideo();
         }
     }, [activeTab]);
@@ -64,7 +65,7 @@ export default function UserValidation() {
                 );
 
                 const canvas = canvasRef.current;
-                const displaySize = { width: videoRef.current.width, height: videoRef.current.height };
+                const displaySize = { width: 350, height: 280 };
                 faceapi.matchDimensions(canvas, displaySize);
 
                 if (detection) {
@@ -76,13 +77,20 @@ export default function UserValidation() {
         }, 100);
     };
 
-    const captureImage = () => {
+    const captureImage = (type) => {
         const canvas = document.createElement('canvas');
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
         canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
         const imageDataUrl = canvas.toDataURL('image/jpeg');
-        setIsCaptured(true);
+        
+        if (type === 'face') {
+            setCapturedImage(imageDataUrl); // Store captured face image data URL in state
+            setIsCaptured(true);
+        } else if (type === 'idCard') {
+            setIdCardCapturedImage(imageDataUrl); // Store captured ID card image data URL in state
+        }
+        
         // Here you can save or process the imageDataUrl
     };
 
@@ -92,11 +100,33 @@ export default function UserValidation() {
         } else {
             setSystemCompatible(false);
         }
+
+        // Check for webcam and audio permissions
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                setWebcamPermission(true);
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(() => {
+                setWebcamPermission(false);
+            });
+
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                setAudioPermission(true);
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(() => {
+                setAudioPermission(false);
+            });
     };
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         setShowCaptureInstructions(false); // Reset capture instructions when changing tabs
+        if (tab === 'webcam' || tab === 'idCard') {
+            startVideo(); // Start the video stream when tab is 'webcam' or 'idCard'
+        }
     };
 
     const handleProceed = () => {
@@ -104,9 +134,8 @@ export default function UserValidation() {
             setActiveTab('webcam');
         } else if (activeTab === 'webcam') {
             setActiveTab('idCard');
-        } else {
-            setProceeded(true);
         }
+        setProceeded(true);
     };
 
     const toggleCaptureInstructions = () => {
@@ -173,6 +202,120 @@ export default function UserValidation() {
         }
     };
 
+    const rightPanelContent = () => {
+        return (
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">Requesting Microphone/Webcam permission</h2>
+                <ul>
+                    <li className={`mb-2 mt-10 ${systemCompatible ? 'text-green-500' : 'text-red-500'}`}>
+                        {systemCompatible ? '✔️' : '❌'} System Compatibility
+                    </li>
+                    <li className={`mb-2 ${webcamPermission ? 'text-green-500' : 'text-red-500'}`}>
+                        {webcamPermission ? '✔️' : '❌'} Webcam Permissions
+                    </li>
+                    <li className={`mb-2 ${audioPermission ? 'text-green-500' : 'text-red-500'}`}>
+                        {audioPermission ? '✔️' : '❌'} Audio Permissions
+                    </li>
+                </ul>
+                {!systemCompatible && <p className="text-red-500 mb-4">Please ensure your system supports media devices.</p>}
+                {!webcamPermission && <p className="text-red-500 mb-4">Please allow webcam access.</p>}
+                {!audioPermission && <p className="text-red-500 mb-4">Please allow microphone access.</p>}
+                {systemCompatible && webcamPermission && audioPermission && (
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-8 rounded" onClick={handleProceed}>Proceed</button>
+                )}
+            </div>
+        );
+    };
+
+    const contentAfterProceed = () => {
+        return (
+            <>
+                <ul className="flex mb-8">
+                    <li className={`mr-6 cursor-pointer ${activeTab === 'registration' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('registration')}>User Registration</li>
+                    <li className={`mr-6 cursor-pointer ${activeTab === 'webcam' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('webcam')}>Webcam Image Upload</li>
+                    <li className={`cursor-pointer ${activeTab === 'idCard' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('idCard')}>ID Card Capture</li>
+                </ul>
+
+                {activeTab === 'registration' && (
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold mb-4">User Registration</h2>
+                        <form>
+                            <label className="block mb-2">Name:</label>
+                            <input type="text" className="border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Enter your name" />
+                            <label className="block mb-2">Email:</label>
+                            <input type="email" className="border border-gray-300 rounded mb-4 px-3 py-2" placeholder="Enter your email" />
+                        </form>
+                        <button type="button" onClick={handleProceed} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">{getProceedButtonText()}</button>
+                    </div>
+                )}
+
+                {activeTab === 'webcam' && (
+                    <div className="mb-8">
+                        <h2 className="text-2xl font-bold mb-4">Webcam Image Upload</h2>
+                        <p className="mb-4 text-sm text-gray-600">
+                            Please align yourself to the center of the screen and press 'Capture Your Face' button.
+                        </p>
+                        <div className="relative">
+                            {isCaptured ? (
+                                <img src={capturedImage} alt="Captured" className="max-w-full max-h-60 mb-4" />
+                            ) : (
+                                <>
+                                    <video ref={videoRef} width="350" height="280" autoPlay onPlay={handleVideoPlay} />
+                                    <canvas ref={canvasRef} className="absolute top-0 left-0" />
+                                </>
+                            )}
+                        </div>
+                        <div className="mt-4">
+                            {!isCaptured && (
+                                <button
+                                    className={`px-4 py-2 bg-blue-500 text-white rounded ${faceDetected ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                    onClick={faceDetected ? () => captureImage('face') : null}
+                                    disabled={!faceDetected} // Disable button if no face detected
+                                >
+                                    Capture Your Face
+                                </button>
+                            )}
+                            {isCaptured && (
+                                <button
+                                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                                    onClick={handleProceed}
+                                >
+                                    Proceed
+                                </button>
+                            )}
+                        </div>
+                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={toggleCaptureInstructions}>Show Capture Instructions</button>
+                    </div>
+                )}
+
+                {activeTab === 'idCard' && (
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">ID Card Capture</h2>
+                        <p className="mb-2">Capture an image of your ID card:</p>
+                        <div className="relative">
+                            {idCardCapturedImage ? (
+                                <img src={idCardCapturedImage} alt="Captured ID Card" className="max-w-full max-h-60 mb-4" />
+                            ) : (
+                                <>
+                                    <video ref={videoRef} width="350" height="280" autoPlay onPlay={handleVideoPlay} />
+                                    <canvas ref={canvasRef} className="absolute top-0 left-0" />
+                                </>
+                            )}
+                        </div>
+                        <div className="mt-4">
+                            {!idCardCapturedImage && (
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => captureImage('idCard')}>Capture ID Card</button>
+                            )}
+                            {idCardCapturedImage && (
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleProceed}>{getProceedButtonText()}</button>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </>
+        );
+    };
+
     return (
         <>
             <Header />
@@ -181,61 +324,7 @@ export default function UserValidation() {
                     {leftPanelContent()}
                 </div>
                 <div className="w-2/3 mt-11 pl-32 p-8">
-                    <ul className="flex mb-8">
-                        <li className={`mr-6 cursor-pointer ${activeTab === 'registration' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('registration')}>User Registration</li>
-                        <li className={`mr-6 cursor-pointer ${activeTab === 'webcam' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('webcam')}>Webcam Image Upload</li>
-                        <li className={`cursor-pointer ${activeTab === 'idCard' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-500'}`} onClick={() => handleTabChange('idCard')}>ID Card Capture</li>
-                    </ul>
-
-                    {activeTab === 'registration' && (
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-bold mb-4">User Registration</h2>
-                            <form>
-                                <label className="block mb-2">Name:</label>
-                                <input type="text" className="border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Enter your name" />
-                                <label className="block mb-2">Email:</label>
-                                <input type="email" className="border border-gray-300 rounded mb-4 px-3 py-2" placeholder="Enter your email" />
-                            </form>
-                            <button type="button" onClick={handleProceed} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">{getProceedButtonText()}</button>
-                        </div>
-                    )}
-
-                    {activeTab === 'webcam' && (
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-bold mb-4">Webcam Image Upload</h2>
-                            <p className="mb-4 text-sm text-gray-600">
-                                Please align yourself to the center of the screen and press 'Capture Your Face' button.
-                            </p>
-                            <div className="relative">
-                                <video ref={videoRef} width="350" height="280" autoPlay onPlay={handleVideoPlay} />
-                                <canvas ref={canvasRef} className="absolute top-0 left-0" />
-                            </div>
-                            <div className="mt-4">
-                                <button
-                                    className="mr-4 px-4 py-2 bg-gray-200 text-gray-700 rounded"
-                                    onClick={() => setIsCaptured(false)}
-                                >
-                                    Re-Capture Your Face
-                                </button>
-                                <button
-                                    className={`px-4 py-2 bg-blue-500 text-white rounded ${faceDetected ? '' : 'opacity-50 cursor-not-allowed'}`}
-                                    onClick={faceDetected ? captureImage : null}
-                                    disabled={!faceDetected} // Disable button if no face detected
-                                >
-                                    {isCaptured ? 'Proceed' : 'Capture Your Face'}
-                                </button>
-                            </div>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={toggleCaptureInstructions}>Capture Image</button>
-                        </div>
-                    )}
-
-                    {activeTab === 'idCard' && (
-                        <div>
-                            <h2 className="text-2xl font-bold mb-4">ID Card Capture</h2>
-                            <p className="mb-2">Capture an image of your ID card:</p>
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleProceed}>{getProceedButtonText()}</button>
-                        </div>
-                    )}
+                    {!proceeded ? rightPanelContent() : contentAfterProceed()}
                 </div>
             </div>
             <Footer />
