@@ -170,7 +170,7 @@ const InterviewBatchForm = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ex: React, NodeJs, Python, etc."
               />
-              <button className='bg-teal-500 text-white w-10 rounded-r-md' onClick={addTag}>+</button>
+              <button className='bg-teal-blue text-white w-10 rounded-r-md' onClick={addTag}>+</button>
             </div>
             <div className="flex flex-wrap">
               {formData.skills.map((skill, index) => (
@@ -254,6 +254,7 @@ const InterviewBatchForm = () => {
           </button>
         </div>
       </form>
+      <br></br>
     </div>
   );
 };
