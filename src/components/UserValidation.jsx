@@ -3,6 +3,7 @@ import * as faceapi from 'face-api.js';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
 import Instructions from '../assets/image.png';
+import { Navigate } from 'react-router-dom';
 
 export default function UserValidation() {
     const [systemCompatible, setSystemCompatible] = useState(false);
@@ -134,6 +135,8 @@ export default function UserValidation() {
             setActiveTab('webcam');
         } else if (activeTab === 'webcam') {
             setActiveTab('idCard');
+        }else{
+            window.location.href = "/monitor";
         }
         setProceeded(true);
     };
@@ -152,8 +155,6 @@ export default function UserValidation() {
             return 'Proceed to Webcam Image Upload';
         } else if (activeTab === 'webcam') {
             return 'Proceed to ID Card Capture';
-        } else {
-            return 'Complete';
         }
     };
 
@@ -307,7 +308,7 @@ export default function UserValidation() {
                                 <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => captureImage('idCard')}>Capture ID Card</button>
                             )}
                             {idCardCapturedImage && (
-                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleProceed}>{getProceedButtonText()}</button>
+                                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleProceed}>Complete</button>
                             )}
                         </div>
                     </div>

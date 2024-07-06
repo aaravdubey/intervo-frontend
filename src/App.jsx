@@ -14,6 +14,7 @@ import ResultsAndFeedBack from './Pages/ResultsAndFeedBack';
 import Practice from './Pages/Practice';
 import DisplayDetails from './components/DisplayDetails';
 import UserValidation from './components/UserValidation';
+import MonitoredSessionDialog from './components/MonitoredSessionDialog';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,6 +31,7 @@ function App() {
       <Route path="/Validate" element={<UserValidation/>} />
       <Route path="/OnlineInterview" element={<OnlineInterview/>} />
       <Route path="/displaydetails" element={<DisplayDetails/>} />
+      <Route path="/monitor" element={<MonitoredSessionDialog/>} />
       <Route path="/ResultsAndFeedback" element={<ResultsAndFeedBack />} />
     </Routes>
   </Router>
