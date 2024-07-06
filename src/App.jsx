@@ -1,8 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Login from './pages/Login';
-import Interviewer_Home from './pages/Interviewer_Home';
-import InterviewPage from './pages/InterviewPage';
+import Interviewer_Home from './pages/Interviewer_Home.jsx';
+import InterviewPage from './pages/InterviewPage.jsx';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   MeetingProvider,
@@ -10,9 +9,10 @@ import {
   useParticipant,
 } from "@videosdk.live/react-sdk";
 import ReactPlayer from "react-player";
-import MeetingView from './pages/MeetingView';
+import MeetingView from './pages/MeetingView.jsx';
 import { createMeeting, getToken } from './API.js';
 import JoinScreen from './pages/JoinScreen.jsx';
+import Login from './pages/Login.jsx';
 
 const App = () => {
   const [meetingId, setMeetingId] = useState(null);
