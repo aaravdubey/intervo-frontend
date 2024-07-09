@@ -9,6 +9,7 @@ import { Home } from './Pages/Home';
   import Header1 from './components/header1';
   import ManageProfile from './components/ManageProfile';
   import Formdetails from './Pages/Formdetails';
+  import CSVTable from "./components/CSVTable";
 
 
 
@@ -40,6 +41,7 @@ import { Home } from './Pages/Home';
           <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/formdetails" element={<Formdetails />} />
+            <Route exact path="/csv-table" element={<CSVTable />} />
             <Route path="/form" element={isAuthenticated ? <BatchForm /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/card" element={isAuthenticated ? <BatchCard /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
