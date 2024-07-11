@@ -17,7 +17,8 @@ const CSVTable = () => {
         setError(null);
         try {
           const csvContent = atob(batch.csvFile);
-          Papa.parse(csvContent, {
+          const cleanedCSVContent = csvContent.charCodeAt(0) === 0xFEFF ? csvContent.slice(1) : csvContent;
+          Papa.parse(cleanedCSVContent, {
             header: true,
             complete: (result) => {
               setCsvData(result.data);
@@ -40,34 +41,16 @@ const CSVTable = () => {
 
   const handleAutomate = async () => {
     try {
-      const validEmails = csvData
-        .filter((row) => row.email && row.email.trim() !== "")
-        .map((row) => ({ email: row.email }));
-  
-      console.log("Valid emails to send:", validEmails); // Log valid emails before sending
-  
-      if (validEmails.length === 0) {
-        console.warn("No valid emails found to send.");
-        return; // Exit early if no valid emails found
-      }
-  
-      const response = await axios.post("http://localhost:3000/api/sendEmails", {
-        emails: validEmails,
-        username: "email", // Use email as username
-        companyType: "defaultCompanyType", // Replace with actual logic
-        companyName: "defaultCompanyName", // Replace with actual logic,
+      const response = await axios.post("http://localhost:3000/api/storeCandidates", {
+        candidates: csvData,
+        companyName: batch.companyName,
       });
-  
-      console.log("Emails sent successfully:", response.data); // Log success message
-  
-      // Optionally, set success message or update state here
+      console.log("Candidates stored and emails sent successfully:", response.data);
     } catch (error) {
-      console.error("Error sending Emails:", error);
-      setError("Error sending Emails");
+      console.error("Error storing candidates and sending emails:", error);
+      setError("Error storing candidates and sending emails");
     }
   };
-  
-  
 
   if (loading) {
     return <p>Loading CSV data...</p>;

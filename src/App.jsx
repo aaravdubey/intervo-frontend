@@ -19,6 +19,8 @@ import { Home } from './Pages/Home';
     Route,
   
   } from "react-router-dom"
+import Interviewer_Home from './Pages/Interviewer_Home';
+import Logins from './Pages/Logins';
 
 
 
@@ -37,8 +39,11 @@ import { Home } from './Pages/Home';
     return (
       <Router>
         <div>
+        
           <Header1 isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
           <Routes>
+          {/* <Route exact path="/userhome" element={<Interviewer_Home/>} />
+        <Route exact path="/logins" element={<Logins />} /> */}
             <Route exact path="/" element={<Home />} />
             <Route exact path="/formdetails" element={<Formdetails />} />
             <Route exact path="/csv-table" element={<CSVTable />} />

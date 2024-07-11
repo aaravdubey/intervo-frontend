@@ -1,22 +1,19 @@
-import InterviewIcon from "../assets/interview-icon.png";
+import React from 'react';
+import { TfiArrowRight } from 'react-icons/tfi';
 
-export default function Card() {
+export default function InterviewCard({ interview, onStartClick }) {
   return (
-    <div className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
-      <a href="#">
-        <img className="rounded saturate-50" src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267" alt="" />
-      </a>
-      <div className="py-5 px-2">
-        <a href="#">
-          <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">TCS Python Developers Recruitment 2024</h5>
-        </a>
-        <p className="mb-3 font-normal text-sm text-gray-700">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
-        <a href="#" className="inline-flex items-center px-4 py-2.5 text-sm font-medium text-center text-white bg-primary-blue rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-          Interview
-          <img src={InterviewIcon} className="ml-2 h-6" alt="Interview Icon" />
-        </a>
+    <div className="border rounded-xl ml-24 shadow-xl overflow-x-auto w-full">
+      <img src={interview.imageUrl} alt={interview.title} className="h-40 w-full object-cover" />
+      <div className="p-4">
+        <span className="text-green-500 text-sm font-semibold px-2 py-1 rounded inline-block mb-2">Active</span>
+        <h2 className="text-xl font-bold mb-2">{interview.title}</h2>
+        <p className="text-gray-600 pt-7 mb-1">{interview.description}</p>
+        <div className="flex items-center justify-between text-gray-700 mb-4"></div>
+        <button onClick={onStartClick} className="flex items-center justify-center bg-teal-blue hover:bg-blue-900 text-white font-semibold py-2 px-4 rounded">
+          Start <TfiArrowRight className="ml-3" size={20} />
+        </button>
       </div>
     </div>
-
-  )
+  );
 }
