@@ -21,6 +21,8 @@ const Login = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isOtpSent, setIsOtpSent] = useState(false);
 
   const [isLogin, setIsLogin] = useState(true);
   const [visible, setVisible] = useState(false);
@@ -34,16 +36,40 @@ const Login = ({ setIsAuthenticated }) => {
     }, 250);
   };
 
+  const sendOtp = async () => {
+    try {
+      await axios.post(`${API_BASE}/api/account/send-otp`, { email: signupEmail });
+      setIsOtpSent(true);
+      toast.success('OTP sent to your email');
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      toast.error('Error sending OTP');
+    }
+  };
+
+  const verifyOtp = async () => {
+    try {
+      const response = await axios.post(`${API_BASE}/api/account/verify-otp`, { email: signupEmail, otp });
+      if (response.data.message === 'OTP verified') {
+        signUp();
+      } else {
+        toast.error('Invalid OTP');
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      toast.error('Error verifying OTP');
+    }
+  };
+
   // Handle signup form submission
-  const signUp = async (e) => {
-    e.preventDefault();
+  const signUp = async () => {
     try {
       const response = await axios.post(`${API_BASE}/api/account/signup`, {
         companyName,
-        companyType,
+        companyType, // Added companyType
         username,
         email: signupEmail,
-        password: signupPassword
+        password: signupPassword,
       });
       const { data } = response;
       if (data.token) {
@@ -138,7 +164,7 @@ const Login = ({ setIsAuthenticated }) => {
               <span className="font-light text-gray-400 mb-8">
                 Sign up now and let's get started!
               </span>
-              <form onSubmit={signUp}>
+              <form onSubmit={(e) => e.preventDefault()}>
                 <div className="py-2">
                   <span className="mb-2 text-md">Company Name</span>
                   <input
@@ -172,7 +198,7 @@ const Login = ({ setIsAuthenticated }) => {
                   <div className='flex'>
                     <input
                       type="text"
-                      className="w-full p-2 border border-gray-300 rounded-s-md placeholder:font-light placeholder:text-gray-500"
+                      className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                       name="username"
                       id="username"
                       value={username}
@@ -182,44 +208,64 @@ const Login = ({ setIsAuthenticated }) => {
                 </div>
                 <div className="py-2">
                   <span className="mb-2 text-md">Email</span>
-                  <div className='flex'>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-s-md placeholder:font-light placeholder:text-gray-500"
-                      name="signupEmail"
-                      id="signupEmail"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                    />
-                  </div>
+                  <input
+                    type="email"
+                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                    name="signupEmail"
+                    id="signupEmail"
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                  />
                 </div>
-                <div className="py-2 pb-10">
+                <div className="py-2">
                   <span className="mb-2 text-md">Password</span>
                   <input
                     type="password"
+                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                     name="signupPassword"
                     id="signupPassword"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   />
                 </div>
-                <button
-                  className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
-                  type='submit'
-                >
-                  Sign up
-                </button>
-                <div className="text-center text-gray-400">
-                  Already have an account?
-                  <button className="font-bold text-teal-blue" onClick={switchSection}> Log In</button>
+                <div className="py-4">
+                  {isOtpSent ? (
+                    <>
+                      <span className="mb-2 text-md">OTP</span>
+                      <input
+                        type="text"
+                        className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                        name="otp"
+                        id="otp"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                      />
+                      <button
+                        className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 mt-4 border hover:border-gray-300 hover:bg-dark-blue"
+                        onClick={verifyOtp}
+                      >
+                        Verify OTP
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
+                      onClick={sendOtp}
+                    >
+                      Send OTP
+                    </button>
+                  )}
                 </div>
               </form>
+              <div className="text-center text-gray-400">
+                Already have an account?
+                <button className="font-bold text-teal-blue" onClick={switchSection}> Sign in</button>
+              </div>
             </>
           )}
         </div>
       </div>
-      <ToastContainer position="bottom-right" autoClose={3000} />
+      <ToastContainer />
     </div>
   );
 };
