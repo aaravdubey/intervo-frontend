@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Papa from "papaparse";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const CSVTable = () => {
   const location = useLocation();
@@ -27,11 +29,13 @@ const CSVTable = () => {
             error: (err) => {
               setError("Error parsing CSV file");
               setLoading(false);
+              toast.error("Error parsing CSV file");
             },
           });
         } catch (err) {
           setError("Error decoding CSV file");
           setLoading(false);
+          toast.error("Error decoding CSV file");
         }
       }
     };
@@ -41,16 +45,16 @@ const CSVTable = () => {
 
   const handleAutomate = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/api/storeCandidates", {
+      await axios.post("http://localhost:3000/api/storeCandidates", {
         candidates: csvData,
         companyName: batch.companyName,
       });
-      console.log("Candidates stored and emails sent successfully:", response.data);
+      toast.success("Candidates stored and emails sent successfully");
     } catch (error) {
-      console.error("Error storing candidates and sending emails:", error);
-      setError("Error storing candidates and sending emails");
+      toast.error("Error storing candidates and sending emails");
     }
   };
+  
 
   if (loading) {
     return <p>Loading CSV data...</p>;
@@ -62,6 +66,7 @@ const CSVTable = () => {
 
   return (
     <div className="px-4 lg:px-28 my-10 text-gray-700">
+      <ToastContainer />
       <h2 className="text-3xl font-bold text-center my-8">
         {batch.companyName} Interview Batch Details
       </h2>
