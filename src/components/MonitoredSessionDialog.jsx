@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FcWebcam } from "react-icons/fc";
 
 const MonitoredSessionDialog = ({ onProceed, onCancel }) => {
@@ -9,8 +10,8 @@ const MonitoredSessionDialog = ({ onProceed, onCancel }) => {
           
           <div>
             <h2 className="text-2xl font-bold mb-4">Monitored Session</h2>
-            <p className="mb-4 text-justify">Intervo will monitor your session for review</p>
-            <p className="mb-4 text-justify">
+            <p className=" text-justify mt-11">Intervo will monitor your session for review</p>
+            <p className="mb-4 text-justify mt-3">
               Please note that by proceeding to participate and/or complete this
               session you consent to be monitored via video/screen feed. This
               monitoring is being undertaken to eliminate any use of unfair
@@ -30,12 +31,14 @@ const MonitoredSessionDialog = ({ onProceed, onCancel }) => {
           >
             Cancel
           </button>
+          <Link to="/test">
           <button
             onClick={onProceed}
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
           >
             Proceed to Test
           </button>
+          </Link>
         </div>
       </div>
     </div>

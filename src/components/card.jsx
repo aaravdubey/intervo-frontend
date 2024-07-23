@@ -1,19 +1,23 @@
 import React from 'react';
 import { TfiArrowRight } from 'react-icons/tfi';
 
-export default function InterviewCard({ interview, onStartClick }) {
+
+
+const InterviewCard = ({ interview, onStartClick }) => {
   return (
-    <div className="border rounded-xl ml-24 shadow-xl overflow-x-auto w-full">
-      <img src={interview.imageUrl} alt={interview.title} className="h-40 w-full object-cover" />
-      <div className="p-4">
-        <span className="text-green-500 text-sm font-semibold px-2 py-1 rounded inline-block mb-2">Active</span>
-        <h2 className="text-xl font-bold mb-2">{interview.title}</h2>
-        <p className="text-gray-600 pt-7 mb-1">{interview.description}</p>
-        <div className="flex items-center justify-between text-gray-700 mb-4"></div>
-        <button onClick={onStartClick} className="flex items-center justify-center bg-teal-blue hover:bg-blue-900 text-white font-semibold py-2 px-4 rounded">
-          Start <TfiArrowRight className="ml-3" size={20} />
-        </button>
-      </div>
+    <div className="p-4 w-1/3 mx-auto border rounded-lg shadow-xl bg-white">
+      <img src={interview.imageUrl} alt={interview.title} className="w-full h-50 object-cover rounded-lg" />
+      <h2 className="text-lg text-green-500 font-semibold mt-6">Active</h2>
+      <h2 className="text-lg  font-semibold mt-6">{interview.title}</h2>
+      <p className="text-sm mt-5">{interview.description}</p>
+      <button
+        className="flex mt-6  px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-700"
+        onClick={onStartClick}
+      >
+        Start Interview  <TfiArrowRight className="ml-3" size={20} />
+      </button>
     </div>
   );
-}
+};
+export default InterviewCard;
+

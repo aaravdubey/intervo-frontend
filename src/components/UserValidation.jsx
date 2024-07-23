@@ -38,7 +38,7 @@ export default function UserValidation() {
             startVideo();
         }
     }, [activeTab]);
-
+    useState('registration'); 
     const startVideo = () => {
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
@@ -129,17 +129,17 @@ export default function UserValidation() {
             startVideo(); // Start the video stream when tab is 'webcam' or 'idCard'
         }
     };
-
     const handleProceed = () => {
         if (activeTab === 'registration') {
-            setActiveTab('webcam');
+           
         } else if (activeTab === 'webcam') {
             setActiveTab('idCard');
-        }else{
+        } else {
             window.location.href = "/monitor";
         }
         setProceeded(true);
     };
+    
 
     const toggleCaptureInstructions = () => {
         setShowCaptureInstructions(true);
@@ -172,7 +172,7 @@ export default function UserValidation() {
                     <h1 className="text-2xl font-semibold mb-4">Instructions for ID Card Capture</h1>
                     <p className="mb-4">Follow these steps to capture your ID card:</p>
                     <ol className="list-decimal list-inside">
-                        <li>Place your ID card on a flat surface.</li>
+                        <li>Place your ID card in front for the webcam.</li>
                         <li>Click the "Capture ID Card" button to take a picture.</li>
                     </ol>
                 </>
@@ -202,19 +202,19 @@ export default function UserValidation() {
             );
         }
     };
-
+    
     const rightPanelContent = () => {
         return (
-            <div className="mb-8">
+            <div className="mb-8 pb-8">
                 <h2 className="text-2xl font-bold mb-4">Requesting Microphone/Webcam permission</h2>
                 <ul>
-                    <li className={`mb-2 mt-10 ${systemCompatible ? 'text-green-500' : 'text-red-500'}`}>
+                    <li className={`mb-6 mt-10 ${systemCompatible ? 'text-green-500' : 'text-red-500'}`}>
                         {systemCompatible ? '✔️' : '❌'} System Compatibility
                     </li>
-                    <li className={`mb-2 ${webcamPermission ? 'text-green-500' : 'text-red-500'}`}>
+                    <li className={`mb-6 ${webcamPermission ? 'text-green-500' : 'text-red-500'}`}>
                         {webcamPermission ? '✔️' : '❌'} Webcam Permissions
                     </li>
-                    <li className={`mb-2 ${audioPermission ? 'text-green-500' : 'text-red-500'}`}>
+                    <li className={`mb-6 ${audioPermission ? 'text-green-500' : 'text-red-500'}`}>
                         {audioPermission ? '✔️' : '❌'} Audio Permissions
                     </li>
                 </ul>
@@ -222,7 +222,7 @@ export default function UserValidation() {
                 {!webcamPermission && <p className="text-red-500 mb-4">Please allow webcam access.</p>}
                 {!audioPermission && <p className="text-red-500 mb-4">Please allow microphone access.</p>}
                 {systemCompatible && webcamPermission && audioPermission && (
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-8 rounded" onClick={handleProceed}>Proceed</button>
+                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mt-12 rounded" onClick={handleProceed}>Proceed</button>
                 )}
             </div>
         );
@@ -246,7 +246,7 @@ export default function UserValidation() {
                             <label className="block mb-2">Email:</label>
                             <input type="email" className="border border-gray-300 rounded mb-4 px-3 py-2" placeholder="Enter your email" />
                         </form>
-                        <button type="button" onClick={handleProceed} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">{getProceedButtonText()}</button>
+                        <button type="button" onClick={handleProceed} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 mt-11 px-4 rounded">{getProceedButtonText()}</button>
                     </div>
                 )}
 
@@ -285,7 +285,7 @@ export default function UserValidation() {
                                 </button>
                             )}
                         </div>
-                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4" onClick={toggleCaptureInstructions}>Show Capture Instructions</button>
+                        
                     </div>
                 )}
 
@@ -320,11 +320,11 @@ export default function UserValidation() {
     return (
         <>
             <Header />
-            <div className="flex h-auto mb-48 bg-gray-100">
-                <div className="w-1/3 p-8 bg-white ">
+            <div className="flex h-auto bg-gray-100 ">
+                <div className="w-1/3 p-8 bg-white  border-2 border-x-slate-400">
                     {leftPanelContent()}
                 </div>
-                <div className="w-2/3 mt-11 pl-32 p-8">
+                <div className="w-2/3 h-auto mt-11 pl-32 p-8 ">
                     {!proceeded ? rightPanelContent() : contentAfterProceed()}
                 </div>
             </div>

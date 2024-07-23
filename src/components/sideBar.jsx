@@ -114,7 +114,7 @@ export default function Sidebar() {
                 <span className="ms-3">Online Interview</span>
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link to='/Practice'
                 
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 group"
@@ -123,7 +123,7 @@ export default function Sidebar() {
                 
                 <span className="ms-3">Practice</span>
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link to='/ResultsAndFeedback'
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 group"

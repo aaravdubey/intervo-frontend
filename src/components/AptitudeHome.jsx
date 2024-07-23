@@ -90,7 +90,7 @@ export default function AptitudeHome() {
         </div>
       </div>
       <div className="w-2/3 mt-11 mb-24 mr-11 bg-white rounded-lg shadow-lg text-black">
-        <div className="relative mt-11">
+        <div className="relative mt-24">
           <div className="flex justify-between  mb-6 ">
             <button onClick={prevSlide} className="text-gray-400  hover:text-gray-600">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

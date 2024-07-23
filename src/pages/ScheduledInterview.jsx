@@ -1,44 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import InterviewCard from '../components/card.jsx';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
 import { Link } from 'react-router-dom';
 
+const API_BASE = 'http://localhost:3000';
+
 export default function ScheduledInterview() {
   const [details, setDetails] = useState(null);
+  const [interviews, setInterviews] = useState([]);
 
-  // Example interview data
-  const interviews = [
-    {
-      id: 1,
-      title: 'Software Developer',
-      description: 'Valid Till: 10-24-2024',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWW9_d3hUdxBZ5W_Ltnlm7hD8fR-3jhvpAYg&s',
-    },
-    {
-      id: 2,
-      title: 'Frontend Developer',
-      description: 'Valid Till: 10-24-2024',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWW9_d3hUdxBZ5W_Ltnlm7hD8fR-3jhvpAYg&s',
-    },
-    {
-      id: 3,
-      title: 'Backend Developer',
-      description: 'Valid Till: 10-24-2024',
-      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWW9_d3hUdxBZ5W_Ltnlm7hD8fR-3jhvpAYg&s',
-    },
-  ];
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found in local storage');
 
-  const handleStartClick = () => {
-    const card1Details = {
-      id: 1,
-      testTime: '2024-07-01 10:00 AM',
-      interviewTime: '2024-07-02 02:00 PM',
-      status: 'Pending',
-      score: null,
-      interviewer: 'John Doe',
+        const response = await axios.get(`${API_BASE}/candidate/interviews`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log('Fetched interviews:', response.data); // Debugging output
+        setInterviews(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Error fetching interviews:', error);
+        setInterviews([]); // Set to empty array in case of error
+      }
     };
-    setDetails(card1Details);
+
+    fetchInterviews();
+  }, []);
+
+  const handleStartClick = (interviewId) => {
+    const selectedInterview = interviews.find(interview => interview.id === interviewId);
+    setDetails(selectedInterview);
   };
 
   const closeDetailsModal = () => {
@@ -48,16 +46,16 @@ export default function ScheduledInterview() {
   return (
     <>
       <Header />
-      <div className="container mb-24 mt-8">
+      <div className="container mb-24 mt-16">
         <div className="flex space-x-24 overflow-x-auto">
           {interviews.map((interview) => (
-            <InterviewCard key={interview.id} interview={interview} onStartClick={handleStartClick} />
+            <InterviewCard key={interview.id} interview={interview} onStartClick={() => handleStartClick(interview.id)} />
           ))}
         </div>
       </div>
       {details && (
         <div id="details-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
             <button
               type="button"
               className="absolute top-3 right-3 text-gray-400 hover:bg-gray-200 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
@@ -75,12 +73,12 @@ export default function ScheduledInterview() {
             <p><strong>Interviewer:</strong> {details.interviewer}</p>
             <div className="mt-4">
               <Link to='/rounds'>
-              <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-2" >
-                Schedule Aptitude
-              </button>
+                <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-12">
+                  Start Aptitude
+                </button>
               </Link>
               <button className="bg-green-500 text-white font-bold py-2 px-4 rounded" onClick={() => alert('Interview scheduled')}>
-                Schedule Interview
+                Start Interview
               </button>
             </div>
           </div>
