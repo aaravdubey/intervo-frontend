@@ -60,7 +60,7 @@ const Login = () => {
       localStorage.setItem('isMhiAsked', false);
       if (data.data.mhiResponse.indexOf('') == -1)
         localStorage.setItem('isMhiAsked', true);
-      navigate('/home');
+      navigate('/');
     }
   }
 
@@ -74,6 +74,13 @@ const Login = () => {
   const handleRemoveTag = (indexToRemove) => {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
+
+  async function sendOTP() {
+    const response = await axios.post(`http://localhost:3000/interviewer/sendOtp`, {email, name});
+    console.log(response.data);
+    // const token = response.data;
+    // return token;
+  }
 
   return <>
     <div className={visible ? "fade-in flex items-center justify-center min-h-screen bg-gradient opacity-0" : "fade-out flex items-center justify-center min-h-screen bg-slate-100"} >
@@ -98,6 +105,7 @@ const Login = () => {
                   id="email1"
                   value={email1}
                   onChange={(e) => setEmail1(e.target.value)}
+                  required
                 />
               </div>
               <div className="py-4">
@@ -109,6 +117,7 @@ const Login = () => {
                   value={password1}
                   onChange={(e) => setPassword1(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                  required
                 />
               </div>
               <div className="flex justify-center w-full py-4">
@@ -117,7 +126,7 @@ const Login = () => {
               <button
                 className="w-96 bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
                 type='submit'
-                onClick={(e) => signIn(e)}
+                onClick={(e) => navigate("/")}
               >
                 Sign in
               </button>
@@ -128,7 +137,7 @@ const Login = () => {
             </div>
           </div> :
 
-          <div className="w-[50vw] flex flex-col justify-center p-8 md:p-14">
+          <form className="w-[50vw] flex flex-col justify-center p-8 md:p-14">
             <img src={Logo} className='w-40 mb-3' />
             <span className="mb-3 text-4xl font-bold">New here?</span>
             <span className="font-light text-gray-400 mb-8">
@@ -143,9 +152,10 @@ const Login = () => {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
-            <div className="py-2">
+            <div className="py-2 flex flex-col">
               <span className="mb-2 text-md">Email</span>
               <input
                 type="text"
@@ -154,7 +164,11 @@ const Login = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
+              <div className="flex justify-end mt-2">
+                <button className="text-xs" onClick={sendOTP}>Send OTP</button>
+              </div>
             </div>
             <div className="py-2">
               <span className="mb-2 text-md">Domain Expertise</span>
@@ -202,6 +216,7 @@ const Login = () => {
                 value={exp}
                 onChange={(e) => setExp(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                required
               />
             </div>
             <div className="py-2">
@@ -216,6 +231,7 @@ const Login = () => {
                     value={fromTime}
                     onChange={(e) => setFromTime(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                    required
                   />
                 </div>
                 <div className='flex items-end w-full gap-3'>
@@ -227,6 +243,7 @@ const Login = () => {
                     value={toTime}
                     onChange={(e) => setToTime(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                    required
                   />
                 </div>
               </div>
@@ -240,11 +257,13 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                required
               />
             </div>
             <button
               className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
               onClick={signUp}
+              type='submit'
             >
               Sign up
             </button>
@@ -252,7 +271,7 @@ const Login = () => {
               Dont have an account?
               <button className="font-bold text-teal-blue" onClick={switchSection}> Log In</button>
             </div>
-          </div>
+          </form>
         }
 
 

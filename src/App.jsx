@@ -1,18 +1,17 @@
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Login from './pages/Login';
-import Interviewer_Home from './pages/Interviewer_Home';
-import InterviewPage from './pages/InterviewPage';
-import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   MeetingProvider,
-  useMeeting,
-  useParticipant,
 } from "@videosdk.live/react-sdk";
-import ReactPlayer from "react-player";
-import MeetingView from './pages/MeetingView';
 import { createMeeting, getToken } from './API.js';
-import JoinScreen from './pages/JoinScreen.jsx';
+import Loading from './pages/Loading.jsx';
+
+const Login = lazy(() => import('./pages/Login'));
+const Interviewer_Home = lazy(() => import('./pages/Interviewer_Home'));
+const InterviewPage = lazy(() => import('./pages/InterviewPage'));
+const MeetingView = lazy(() => import('./pages/MeetingView'));
+const JoinScreen = lazy(() => import('./pages/JoinScreen.jsx'));
 
 const App = () => {
   const [meetingId, setMeetingId] = useState(null);
@@ -26,7 +25,8 @@ const App = () => {
         setAuthToken(token);
       } catch (error) {
         console.error("Failed to fetch token:", error);
-      } finally {
+      }
+      finally {
         setLoading(false);
       }
     };
@@ -36,7 +36,7 @@ const App = () => {
 
   const getMeetingAndToken = async (id) => {
     const meetingId =
-      id == null ? await createMeeting( authToken ) : id;
+      id == null ? await createMeeting(authToken) : id;
     setMeetingId(meetingId);
   };
 
@@ -45,7 +45,7 @@ const App = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
@@ -59,26 +59,28 @@ const App = () => {
       token={authToken}
     >
       <BrowserRouter>
-        <Routes>
-          <Route index path='/login' element={<Login />} />
-          <Route index path='*' element={<Interviewer_Home />} />
-          <Route index path='/interview' element={<InterviewPage />} />
-          <Route index path='/meeting' element={authToken && meetingId ? (
-            <MeetingProvider
-              config={{
-                meetingId,
-                micEnabled: true,
-                webcamEnabled: true,
-                name: "User X",
-              }}
-              token={authToken}
-            >
-              <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
-            </MeetingProvider>
-          ) : (
-            <JoinScreen getMeetingAndToken={getMeetingAndToken} />
-          )} />
-        </Routes>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route index path='/login' element={<Login />} />
+            <Route index path='*' element={<Interviewer_Home />} />
+            <Route index path='/interview' element={<InterviewPage />} />
+            <Route index path='/meeting' element={authToken && meetingId ? (
+              <MeetingProvider
+                config={{
+                  meetingId,
+                  micEnabled: true,
+                  webcamEnabled: true,
+                  name: "User X",
+                }}
+                token={authToken}
+              >
+                <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
+              </MeetingProvider>
+            ) : (
+              <JoinScreen getMeetingAndToken={getMeetingAndToken} />
+            )} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </MeetingProvider>
   );
