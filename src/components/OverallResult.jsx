@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React from 'react';
 import GaugeComponent from 'react-gauge-component'
 const OverallResult = () => {

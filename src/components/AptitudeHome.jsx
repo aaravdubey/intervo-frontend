@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TbPlugConnected } from "react-icons/tb";
@@ -68,7 +69,7 @@ export default function AptitudeHome() {
                     <h2 className="text-3xl font-bold mb-8">Welcome to</h2>
                     <h3 className="text-4xl font-bold mb-12">Sample Test-copy</h3>
 
-                    <div className="flex justify-between mb-4">
+                    <div className="flex justify-between  mb-4">
                         <div>
                             <p className="font-semibold">Questions</p>
                             <p>4 Questions</p>

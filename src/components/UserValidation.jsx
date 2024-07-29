@@ -131,7 +131,7 @@ export default function UserValidation() {
     };
     const handleProceed = () => {
         if (activeTab === 'registration') {
-           
+           setActiveTab('registration')
         } else if (activeTab === 'webcam') {
             setActiveTab('idCard');
         } else {
