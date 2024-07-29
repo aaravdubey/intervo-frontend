@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
-import QuestionCard from '../components/QuestionCard'; // Assume you have a component for questions
+import QuestionCard from '../components/QuestionCard.jsx'; // Assume you have a component for questions
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:3000';

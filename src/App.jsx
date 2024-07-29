@@ -4,14 +4,14 @@ import viteLogo from '/vite.svg'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css'
 
-import Login from './Pages/Login';
+import Login from './Authentication/Login';
 
 import ScheduledInterview from './Pages/ScheduledInterview';
 import Rounds from './Pages/Rounds';
 
 import OnlineInterview from './Pages/OnlineInterview';
 import ResultsAndFeedBack from './Pages/ResultsAndFeedBack';
-import Practice from './Pages/Practice';
+
 import DisplayDetails from './components/DisplayDetails';
 import UserValidation from './components/UserValidation';
 import MonitoredSessionDialog from './components/MonitoredSessionDialog';
@@ -28,7 +28,7 @@ function App() {
 
       <Route path="/home" element={<ScheduledInterview />} />
       <Route path="/Rounds" element={<Rounds />} />
-      <Route path="/Practice" element={<Practice />} />
+
       <Route path="/Validate" element={<UserValidation/>} />
       <Route path="/OnlineInterview" element={<OnlineInterview/>} />
       <Route path="/displaydetails" element={<DisplayDetails/>} />
