@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // import LoginImage from "../assets/Images/login.jpg"
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 const API_BASE = 'http://localhost:3000';
 import Logo from "../assets/logo.png";
 import Pattern from "../assets/pattern.png";
+import { TiTick } from "react-icons/ti";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,6 +18,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
 
   const [email1, setEmail1] = useState('');
+  const [otp, setOtp] = useState('');
   const [password1, setPassword1] = useState('');
   const [exp, setExp] = useState('');
   const [fromTime, setFromTime] = useState('');
@@ -25,6 +30,9 @@ const Login = () => {
   const [inputValue, setInputValue] = useState('');
   const [tags, setTags] = useState([]);
 
+  const [isSent, setIsSent] = useState(0);
+  const [isVerified, setIsVerified] = useState(0);
+
   const switchSection = () => {
     setVisible(true);
 
@@ -34,33 +42,25 @@ const Login = () => {
     }, 250);
   };
 
-  const signUp = async () => {
-    const data = await axios.post(`${API_BASE}/account/signup`, { name, anonymousName, email, password });
-
-    console.log(data);
-    if (data.status == 201) {
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('username', data.data.username);
-      localStorage.setItem('anonymousName', data.data.anonymousName);
-      localStorage.setItem('mhiResponse', data.data.mhiResponse);
-      localStorage.setItem('isMhiAsked', false);
-      navigate('/home');
-    }
-  }
   const signIn = async (e) => {
     e.preventDefault();
-    const data = await axios.post(`${API_BASE}/account/signin`, { email1, password1 });
+    try {
+      const data = await axios.post(`http://localhost:3000/interviewer/login`, { email: email1, password: password1 });
 
-    console.log(data);
-    if (data.status == 200) {
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('username', data.data.username);
-      localStorage.setItem('anonymousName', data.data.anonymousName);
-      localStorage.setItem('mhiResponse', data.data.mhiResponse);
-      localStorage.setItem('isMhiAsked', false);
-      if (data.data.mhiResponse.indexOf('') == -1)
-        localStorage.setItem('isMhiAsked', true);
-      navigate('/');
+      console.log(data);
+      if (data.status == 200) {
+        Cookies.set('token', data.data.token, { expires: 1 });
+        Cookies.set('name', data.data.interviewer.name, { expires: 1 });
+        Cookies.set('email', data.data.interviewer.email, { expires: 1 });
+
+        // localStorage.setItem('token', data.data.token);
+        // localStorage.setItem('name', data.data.interviewer.name);
+        // localStorage.setItem('email', data.data.interviewer.email);
+        navigate('/');
+      }
+    } catch (error) {
+      if (error.response.status === 400) toast("Invalid credentials", { type: 'error' });
+      // console.log(error);
     }
   }
 
@@ -76,17 +76,64 @@ const Login = () => {
   };
 
   async function sendOTP() {
-    const response = await axios.post(`http://localhost:3000/interviewer/sendOtp`, {email, name});
+    setIsSent(1);
+    const response = await axios.post(`http://localhost:3000/interviewer/sendOtp`, { email, name });
     console.log(response.data);
+    if (response.status === 200) setIsSent(2);
+    else setIsSent(0);
     // const token = response.data;
     // return token;
   }
+  async function verifyOTP() {
+    try {
+      setIsVerified(1);
+      const response = await axios.post(`http://localhost:3000/interviewer/verifyOtp`, { email, otp });
+      console.log(response.data);
+      setIsVerified(2);
+    } catch (error) {
+      if (error.response.status === 400) setIsVerified(4);
+    }
+  }
+
+  async function register(e) {
+    e.preventDefault();
+    if (isVerified == 2) {
+      const data = await axios.post(`http://localhost:3000/interviewer/register`, { name, email, password, exp, timeFrom: fromTime, timeTo: toTime, domains: tags, days: selectedDays });
+
+      console.log(data);
+      if (data.status == 201) {
+        // localStorage.setItem('token', data.data.token);
+        // localStorage.setItem('username', data.data.username);
+        toast("Account created successfully", { type: 'success' });
+        switchSection();
+      }
+    }
+  }
+
+  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const [selectedDays, setSelectedDays] = useState([]);
+
+  const toggleDay = (day) => {
+    setSelectedDays((prevSelectedDays) =>
+      prevSelectedDays.includes(day)
+        ? prevSelectedDays.filter(d => d !== day)
+        : [...prevSelectedDays, day]
+    );
+    console.log(selectedDays);
+  };
+
+  useEffect(() => {
+    let token = Cookies.get('token');
+    if (token) navigate("/");
+  }, [])
 
   return <>
-    <div className={visible ? "fade-in flex items-center justify-center min-h-screen bg-gradient opacity-0" : "fade-out flex items-center justify-center min-h-screen bg-slate-100"} >
+    <div className={visible ? "fade-in flex items-center justify-center min-h-screen bg-gradient opacity-0 relative" : "fade-out flex items-center justify-center min-h-screen bg-slate-100 relative"} >
+      <ToastContainer />
       <img src={Pattern} className="absolute z-0 object-cover w-full h-full opacity-20" />
       <div
-        className="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0 text-gray-700"
+        className="w-full md:w-fit relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0 text-gray-700"
       >
         {isLogin ?
           <div className="flex flex-col justify-center p-8 md:p-14">
@@ -95,7 +142,7 @@ const Login = () => {
             <span className="font-light text-gray-400 mb-4">
               Welcom back! Please enter your details
             </span>
-            <form>
+            <form onSubmit={signIn}>
               <div className="py-4">
                 <span className="mb-2 text-md">Email</span>
                 <input
@@ -124,9 +171,8 @@ const Login = () => {
                 <span className="font-bold text-md">Forgot password</span>
               </div>
               <button
-                className="w-96 bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
+                className="w-96 bg-teal-blue text-white p-2 rounded-lg mb-6 border "
                 type='submit'
-                onClick={(e) => navigate("/")}
               >
                 Sign in
               </button>
@@ -137,7 +183,7 @@ const Login = () => {
             </div>
           </div> :
 
-          <form className="w-[50vw] flex flex-col justify-center p-8 md:p-14">
+          <form onSubmit={register} className="md:w-[65vw] lg:w-[50vw] flex flex-col justify-center p-8 md:p-14">
             <img src={Logo} className='w-40 mb-3' />
             <span className="mb-3 text-4xl font-bold">New here?</span>
             <span className="font-light text-gray-400 mb-8">
@@ -167,7 +213,34 @@ const Login = () => {
                 required
               />
               <div className="flex justify-end mt-2">
-                <button className="text-xs" onClick={sendOTP}>Send OTP</button>
+                {isSent == 2 && <TiTick className='text-primary-blue' />}
+                {isSent == 2 ? <div className='flex gap-5'><p className={`text-primary-blue text-xs`} onClick={sendOTP}>OTP sent</p>
+                  <button className={`text-dark-blue text-xs`} onClick={sendOTP}>Resend OTP</button>
+                </div> :
+                  isSent == 1 ? <p className={`text-dark-blue text-xs`} onClick={sendOTP}>Sending...</p> :
+                    <button className={`text-dark-blue text-xs`} onClick={sendOTP}>Send OTP</button>
+                }
+              </div>
+            </div>
+            <div className="py-2">
+              <span className="mb-2 text-md">OTP</span>
+              <input
+                type="number"
+                max={999999}
+                className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                name="domain"
+                id="domain"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="012345 "
+              />
+              <div className="flex justify-end mt-2">
+                {isVerified == 2 && <TiTick className='text-primary-blue' />}
+                {isVerified == 2 ? <button className={`text-primary-blue text-xs`} onClick={verifyOTP}>Email verfied</button> :
+                  isVerified == 1 ? <p className={`text-dark-blue text-xs`} onClick={verifyOTP}>Verifying...</p> :
+                    isVerified == 4 ? <button className={`text-red-500 text-xs`} onClick={verifyOTP}>Invalid OTP, Verify again?</button> :
+                      <button className={`text-dark-blue text-xs`} onClick={verifyOTP}>Verify Email</button>
+                }
               </div>
             </div>
             <div className="py-2">
@@ -176,13 +249,13 @@ const Login = () => {
                 <input
                   type="text"
                   className="w-full p-2 border border-gray-300 rounded-s-md placeholder:font-light placeholder:text-gray-500"
-                  name="domain"
-                  id="domain"
+                  name="domains"
+                  id="domains"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Ex: React, NodeJs, Python, etc."
                 />
-                <button className='bg-teal-blue text-white w-10 rounded-e-md' onClick={addTag}>+</button>
+                <button type='button' className='bg-teal-blue text-white w-10 rounded-e-md' onClick={addTag}>+</button>
               </div>
             </div>
             <div>
@@ -207,7 +280,7 @@ const Login = () => {
                 </div>
               ))}
             </div>
-            <div className="py-2">
+            <div className="py-2 mt-2">
               <span className="mb-2 text-md">Experience (In Months)</span>
               <input
                 type="number"
@@ -219,15 +292,29 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="py-2">
+            <div className="py-2 mt-2">
+              <span className="mb-2 text-md">Day Availibility</span>
+              <div className="flex flex-wrap justify-between gap-3 py-2">
+                {daysOfWeek.map((day) => (
+                  <div
+                    key={day}
+                    className={`cursor-pointer w-12 text-center py-2.5 rounded-full border ${selectedDays.includes(day) ? 'bg-teal-blue text-white border-lightbg-teal-blue' : 'bg-gray-100 text-black'}`}
+                    onClick={() => toggleDay(day)}
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="py-2 mt-2">
               <span className="mb-2 text-md">Time Availibility</span>
               <div className='flex gap-3'>
                 <div className='flex items-end w-full gap-3'>
-                  <span className='text-gray-400'>from</span>
+                  <span>from</span>
                   <input
                     type="time"
-                    name="fromtime"
-                    id="fromtime"
+                    name="timeFrom"
+                    id="timeFrom"
                     value={fromTime}
                     onChange={(e) => setFromTime(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
@@ -235,11 +322,11 @@ const Login = () => {
                   />
                 </div>
                 <div className='flex items-end w-full gap-3'>
-                  <span className='text-gray-400'>to</span>
+                  <span>to</span>
                   <input
                     type="time"
-                    name="totime"
-                    id="totime"
+                    name="timeTo"
+                    id="timeTo"
                     value={toTime}
                     onChange={(e) => setToTime(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
@@ -248,7 +335,7 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <div className="py-2 pb-10">
+            <div className="py-2 pb-10 mt-2">
               <span className="mb-2 text-md">Password</span>
               <input
                 type="password"
@@ -261,15 +348,14 @@ const Login = () => {
               />
             </div>
             <button
-              className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
-              onClick={signUp}
+              className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border "
               type='submit'
             >
               Sign up
             </button>
             <div className="text-center text-gray-400">
               Dont have an account?
-              <button className="font-bold text-teal-blue" onClick={switchSection}> Log In</button>
+              <button className="font-bold text-teal-blue" type='button' onClick={switchSection}> Log In</button>
             </div>
           </form>
         }

@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router";
 import InterviewIcon from "../assets/interview-icon.png";
 import { IoPersonSharp } from "react-icons/io5";
+import { TiTick } from "react-icons/ti";
+import { MdDone } from "react-icons/md";
+import { SiTicktick } from "react-icons/si";
+import { IoMdTime } from "react-icons/io";
 
-export default function Card() {
+
+export default function CardScheduled() {
   const navigate = useNavigate();
 
   return (
-    <div onClick={() => navigate('/new-interview')} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
+    <div onClick={() => navigate('/interview')} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
       <a href="">
         <img className="rounded saturate-50" src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267" alt="" />
       </a>
@@ -14,7 +19,14 @@ export default function Card() {
         <a href="#">
           <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">TCS Python Developers Recruitment 2024</h5>
         </a>
-        <p className="mb-3 font-normal text-sm text-gray-700">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
+        <div className="w-full flex justify-between mb-2 font-normal text-sm text-gray-800">
+          <p>Tests</p>
+          <SiTicktick className="text-primary-blue" />
+        </div>
+        <div className="w-full flex justify-between mb-3 font-normal text-sm text-gray-800">
+          <p>Interviews</p>
+          <p>0/25</p>
+        </div>
         <div className="flex justify-between">
 
           <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">react</span>

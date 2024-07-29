@@ -4,22 +4,51 @@ import { FaVideo } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
 import { useNavigate } from "react-router";
 import InterviewImg from "../assets/interview.png";
+import { FaInfoCircle } from "react-icons/fa";
+import Modal from "../components/modal";
+import { useState } from "react";
 
 
-export default function InterviewPage() {
+
+
+export default function NewInterviewPage() {
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return <>
     <Header />
+    <Modal
+      isModalOpen={isModalOpen}
+      setIsModalOpen={setIsModalOpen}
+      heading={""}
+      text={""}
+      confirmText={""}
+      cancelText={""}
+      onConfirm={() => { }}
+      onCancel={() => { }}
+    />
     <div className="px-4 lg:px-28 mt-10 mb-16 text-gray-700">
-      <h1 className="text-4xl font-semibold">TCS Python Developers Recruitment 2024</h1>
-      <p className="my-4 text-gray-500">We are an XYZ company, in need of ABC developers. We need our candidates evaluated thororughly based on ABC, LMN and XYZ parameters. We are an XYZ company, in need of ABC developers. We need our candidates evaluated thororughly based on ABC, LMN and XYZ parameters.</p>
-      <div className="flex gap-3">
-        <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">react</span>
-        <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">javascript</span>
+      <div className="flex gap-16">
+        <div>
+          <h1 className="text-4xl font-semibold">TCS Python Developers Recruitment 2024</h1>
+          <p className="my-4 text-gray-500">We are an XYZ company, in need of ABC developers. We need our candidates evaluated thororughly based on ABC, LMN and XYZ parameters. We are an XYZ company, in need of ABC developers. We need our candidates evaluated thororughly based on ABC, LMN and XYZ parameters.</p>
+          <div className="flex gap-3">
+            <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">react</span>
+            <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">javascript</span>
+          </div>
+        </div>
+        <div>
+          <button className="bg-primary-blue text-white rounded-full w-full h-12 font-semibold whitespace-nowrap hover:brightness-110" onClick={() => setIsModalOpen(true)}>Confirm Interview</button>
+          <p className="text-xs mt-2 text-gray-500">
+            <FaInfoCircle className="text-teal-blue inline-block mr-1" />
+            Once confirmed, you can't cancel the scheduled interview. So, please confirm only when you are sure of the scheduled dates.
+          </p>
+        </div>
       </div>
+
+
       <div>
-        <p className="text-xl font-semibold mt-14">Interview Meeting(s)</p>
+        <p className="text-xl font-semibold mt-14">Estimated Interview Meeting(s)</p>
         <div className="flex gap-12">
           <div className="mt-2 text-sm text-gray-600 flex items-center gap-5 border p-4 rounded-lg leading-6">
             <img src={InterviewImg} alt="Interview" className="w-20 h-20" />
@@ -40,16 +69,6 @@ export default function InterviewPage() {
             </div>
           </div>
 
-          <div className="flex flex-col justify-evenly">
-            <button className="bg-primary-blue hover:brightness-125 text-white px-6 py-2 rounded-full flex items-center justify-center gap-2" onClick={() => navigate('/meeting')}>
-              <FaVideo className="text-2xl" />
-              <p className="text-xs font-bold">Join Meeting</p>
-            </button>
-            <button className="bg-light-blue hover:bg-blue-50 text-gray-600 px-6 py-2 rounded-full flex items-center gap-2">
-              <IoCopy className="text-2xl" />
-              <p className="text-xs font-bold">Copy Link</p>
-            </button>
-          </div>
         </div>
       </div>
 

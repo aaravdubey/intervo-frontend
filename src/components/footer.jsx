@@ -6,7 +6,7 @@ export default function Footer() {
 
     <footer className="bg-dark-blue relative">
       <div className="absolute inset-0 bg-cover bg-no-repeat bg-center opacity-5" style={{ backgroundImage: `url(${Pattern})`, filter: 'brightness(0) invert(1)' }}></div>
-      <div className="mx-auto w-full max-w-screen-xl p-4 py-14 lg:py-16">
+      <div className="mx-auto w-full px-10  py-14 lg:py-16">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="https://flowbite.com/" className="flex items-center">
