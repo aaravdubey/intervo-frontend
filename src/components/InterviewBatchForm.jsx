@@ -47,17 +47,22 @@ const InterviewBatchForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
+    if (!formData.companyName || !formData.totalCandidatesRequired || !formData.domains || !formData.deadline || !formData.csvFile) {
+      toast.error('Please fill out all required fields.');
+      return;
+    }
+  
     const formDataForSubmission = new FormData();
     formDataForSubmission.append("companyName", formData.companyName);
     formDataForSubmission.append("totalCandidatesRequired", formData.totalCandidatesRequired);
     formDataForSubmission.append("domains", formData.domains);
     formDataForSubmission.append("skills", JSON.stringify(formData.skills));
     formDataForSubmission.append("interviewTypes", JSON.stringify(formData.interviewTypes));
-    formDataForSubmission.append("deadline", formData.deadline);
+    formDataForSubmission.append("deadline", formData.deadline.toISOString()); // Ensure proper date format
     formDataForSubmission.append("csvFile", formData.csvFile);
     formDataForSubmission.append("note", formData.note);
-
+  
     try {
       const response = await axios.post(`${API_BASE}/api/interviewBatch`, formDataForSubmission, {
         headers: {
@@ -65,9 +70,8 @@ const InterviewBatchForm = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-
+  
       if (response.status === 201) {
-        console.log("Interview batch created successfully");
         toast.success('Interview batch created successfully');
         setFormData({
           companyName: localStorage.getItem('companyName') || "",
@@ -81,15 +85,14 @@ const InterviewBatchForm = () => {
         });
         setInputValue("");
       } else {
-        console.error("Failed to create interview batch", response.data.message);
         toast.error(`Failed to create interview batch: ${response.data.message}`);
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error details:', error.response?.data || error.message);
       toast.error(`Error submitting form: ${error.message}`);
     }
   };
-
+  
   const addTag = (e) => {
     e.preventDefault();
     if (inputValue.trim() && !formData.skills.includes(inputValue.trim())) {

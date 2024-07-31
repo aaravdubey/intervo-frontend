@@ -2,13 +2,13 @@
   import React, { useState } from 'react';
   import { useEffect } from 'react';
   import './App.css'
-  import { BatchCard } from './Pages/BatchCard';
-  import { BatchForm } from './Pages/BatchForm';
-import { Home } from './Pages/Home';
-  import  Login  from './Pages/Login';
+  import { BatchCard } from './pages/BatchCard';
+  import { BatchForm } from './pages/BatchForm';
+import { Home } from './pages/Home';
+  import  Login  from './pages/Login';
   import Header1 from './components/header1';
   import ManageProfile from './components/ManageProfile';
-  import Formdetails from './Pages/Formdetails';
+  import Formdetails from './pages/Formdetails';
   import CSVTable from "./components/CSVTable";
 
 
@@ -19,8 +19,8 @@ import { Home } from './Pages/Home';
     Route,
   
   } from "react-router-dom"
-import Interviewer_Home from './Pages/Interviewer_Home';
-import Logins from './Pages/Logins';
+import Interviewer_Home from './pages/Interviewer_Home';
+import Logins from './pages/Logins';
 
 
 
