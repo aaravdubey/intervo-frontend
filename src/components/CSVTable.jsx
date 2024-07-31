@@ -76,12 +76,7 @@ const CSVTable = () => {
       {batch.note && (
         <p className="mb-1 font-normal text-sm text-gray-700">Note: {batch.note}</p>
       )}
-      <button
-        onClick={handleAutomate}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-      >
-        Automate Email Sending
-      </button>
+  
       <table className="text-left w-full border-collapse">
         <thead>
           <tr>
@@ -105,6 +100,12 @@ const CSVTable = () => {
           ))}
         </tbody>
       </table>
+      <button
+        onClick={handleAutomate}
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+      >
+        Automate Email Sending
+      </button>
     </div>
   );
 };

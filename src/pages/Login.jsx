@@ -99,7 +99,7 @@ const Login = ({ setIsAuthenticated }) => {
         localStorage.setItem('username', data.username);
         localStorage.setItem('companyName', data.companyName); // Store company name
         setIsAuthenticated(true);
-        navigate('/form');
+        navigate('/card');
         toast.success('Login successful!');
       }
     } catch (error) {
