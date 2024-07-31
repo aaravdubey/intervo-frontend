@@ -47,7 +47,7 @@ export default function ScheduledInterview() {
   return (
     <>
       <Header />
-      <div className="container mb-24 mt-16">
+      <div className="container  min-h-auto mb-14 mt-11">
         <div className="flex space-x-24 overflow-x-auto">
           {interviews.map((interview) => (
             <InterviewCard key={interview.id} interview={interview} onStartClick={() => handleStartClick(interview.id)} />

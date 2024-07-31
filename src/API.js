@@ -20,7 +20,7 @@ export const createMeeting = async (authToken) => {
 
 export const getToken = async () => {
   const response = await axios.post(`http://localhost:3000/meeting/getAuthKey`);
-  // console.log(response.data);
+  console.log(response.data);
   const token = response.data;
   return token;
 }
