@@ -8,6 +8,14 @@ import { CiLogout } from "react-icons/ci";
 export default function Header() {
   const navigate = useNavigate(); // Initialize useNavigate
 
+  // Handle logout functionality
+  const handleLogout = () => {
+    // Clear user authentication tokens or session data
+    localStorage.removeItem('token');
+
+    // Redirect to the login page
+    navigate('/');
+  };
 
   return (
     <header>
@@ -22,11 +30,11 @@ export default function Header() {
           </div>
           <div className="absolute top-3 right-6 mt-4 mr-4 flex items-center">
             <div className="pr-2">
-              <Link to='/'>
+              <Link to="/" onClick={handleLogout}>
                 <CiLogout size={24} />
               </Link>
             </div>
-            <button className="text-black" >Logout</button>
+            <button className="text-black" onClick={handleLogout}>Logout</button>
           </div>
         </div>
       </nav>

@@ -1,18 +1,53 @@
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TbPlugConnected } from "react-icons/tb";
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:3000';
 
 export default function AptitudeHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [interview, setInterview] = useState(null);
 
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found in local storage');
+
+        const response = await axios.get(`${API_BASE}/candidate/interviews`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log('Fetched interviews:', response.data);
+
+        const interviewDetails = Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null;
+        setInterview(interviewDetails);
+      } catch (error) {
+        console.error('Error fetching interviews:', error);
+        setInterview(null); // Set to null in case of error
+      }
+    };
+
+    fetchInterviews();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+    }, 3000); // Change slide every 2 seconds
+
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, []);
+
+  const Name = interview?.name || 'Name';
   const slides = [
     {
       title: "Internet Connectivity",
       content: "Ensure that you have a stable internet connection with a minimum speed of 512 kbps",
-      icon: (
-       <TbPlugConnected size={60}/>
-      ),
+      icon: <TbPlugConnected size={60} />,
     },
     {
       title: "Don't Refresh",
@@ -62,57 +97,55 @@ export default function AptitudeHome() {
   };
 
   return (
-    <div className="flex justify-center  bg-gray-900 text-white min-h-auto">
-      <div className="w-1/3 mx-24 mb-24 p-24 ">
-        <div className="mb-8 ">
-        <h1 className="text-2xl font-semibold mb-4">Hi,</h1>
-                    <h2 className="text-3xl font-bold mb-8">Welcome to</h2>
-                    <h3 className="text-4xl font-bold mb-12">Sample Test-copy</h3>
+    <div className="flex justify-center bg-gray-900 text-white min-h-auto">
+      <div className="w-1/3 mx-24 mb-24 p-24">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold mb-4">Hi {Name},</h1>
+          <h2 className="text-3xl font-bold mb-8">Welcome to</h2>
+          <h3 className="text-4xl font-bold mb-12">Aptitude Round</h3>
 
-                    <div className="flex justify-between  mb-4">
-                        <div>
-                            <p className="font-semibold">Questions</p>
-                            <p>4 Questions</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Sections</p>
-                            <p>2 Sections</p>
-                        </div>
-                        <div>
-                            <p className="font-semibold">Test Duration</p>
-                            <p>60 Minutes</p>
-                        </div>
-                    </div>
+          <div className="flex justify-between mb-4">
+            <div>
+              <p className="font-semibold">Questions</p>
+              <p>4 Questions</p>
+            </div>
+            <div>
+              <p className="font-semibold">Sections</p>
+              <p>2 Sections</p>
+            </div>
+            <div>
+              <p className="font-semibold">Test Duration</p>
+              <p>60 Minutes</p>
+            </div>
+          </div>
           <Link to="/Validate">
-          <button className="mt-4  px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 focus:outline-none">
-            Proceed
-          </button>
+            <button className="mt-4 px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 focus:outline-none">
+              Proceed
+            </button>
           </Link>
         </div>
       </div>
-      <div className="w-2/3 mt-11 mb-24 mr-11 bg-white rounded-lg shadow-lg text-black">
-        <div className="relative mt-24">
-          <div className="flex justify-between  mb-6 ">
-            <button onClick={prevSlide} className="text-gray-400  hover:text-gray-600">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
-              </svg>
-            </button>
-            <button onClick={nextSlide} className="text-gray-400 hover:text-gray-600">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19l7-7-7-7"></path>
-              </svg>
-            </button>
+      <div className="w-2/3 mt-11 mb-24 mr-11 bg-white rounded-lg shadow-lg text-black overflow-hidden">
+        <div className="relative">
+          <div className="flex justify-between mb-6">
+            {/*  */}
           </div>
 
-          <div className="flex justify-center pb-11 mb-6">
-            {slides[currentSlide].icon}
+          <div className="relative mt-24">
+            <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+              {slides.map((slide, index) => (
+                <div key={index} className="w-full flex-shrink-0">
+                  <div className="flex justify-center pb-11 mb-6">
+                    {slide.icon}
+                  </div>
+                  <h2 className="text-2xl font-semibold text-center mb-4">{slide.title}</h2>
+                  <p className="text-center text-gray-700 mb-8">
+                    {slide.content}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-
-          <h2 className="text-2xl font-semibold text-center mb-4">{slides[currentSlide].title}</h2>
-          <p className="text-center text-gray-700 mb-8">
-            {slides[currentSlide].content}
-          </p>
 
           <div className="flex justify-center pb-11 space-x-2">
             {slides.map((_, index) => (

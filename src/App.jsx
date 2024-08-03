@@ -19,7 +19,8 @@ import MonitoredSessionDialog from './components/MonitoredSessionDialog';
 import TestPage from './Pages/TestPage';
 import JoinScreen from './Pages/JoinScreen';
 import MeetingView from './Pages/MeetingView.jsx';
-
+import ProtectedRoute from './Authentication/ProtectedRoute.jsx'
+import { AuthProvider } from './Authentication/AuthContext.jsx';
 const API_BASE = 'http://localhost:3000';
 
 function App() {
@@ -86,47 +87,74 @@ function App() {
   }
 
   return (
-    <MeetingProvider
-      config={{
-        meetingId,
-        micEnabled: true,
-        webcamEnabled: true,
-        name,
-      }}
-      token={authToken}
-    >
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/home" element={<ScheduledInterview />} />
-          <Route path="/Rounds" element={<Rounds />} />
-          <Route path="/Validate" element={<UserValidation />} />
-          <Route path="/displaydetails" element={<DisplayDetails />} />
-          <Route path="/monitor" element={<MonitoredSessionDialog />} />
-          <Route path="/test" element={<TestPage />} />
-          <Route
-            path="/OnlineInterview"
-            element={authToken && meetingId ? (
-              <MeetingProvider
-                config={{
-                  meetingId,
-                  micEnabled: true,
-                  webcamEnabled: true,
-                  name,
-                }}
-                token={authToken}
-              >
-                <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
-              </MeetingProvider>
-            ) : (
-              <JoinScreen getMeetingAndToken={getMeetingAndToken} />
-            )}
-          />
-          <Route path="/ResultsAndFeedback" element={<ResultsAndFeedBack />} />
-        </Routes>
-      </Router>
-    </MeetingProvider>
-  );
-}
 
+   
+      <MeetingProvider
+        config={{
+          meetingId,
+          micEnabled: true,
+          webcamEnabled: true,
+          name,
+        }}
+        token={authToken}
+      >
+        <Router>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route
+                path="/home"
+                element={<ProtectedRoute element={<ScheduledInterview />} />}
+              />
+              <Route
+                path="/Rounds"
+                element={<ProtectedRoute element={<Rounds />} />}
+              />
+              <Route
+                path="/Validate"
+                element={<ProtectedRoute element={<UserValidation />} />}
+              />
+              <Route
+                path="/displaydetails"
+                element={<ProtectedRoute element={<DisplayDetails />} />}
+              />
+              <Route
+                path="/monitor"
+                element={<ProtectedRoute element={<MonitoredSessionDialog />} />}
+              />
+              <Route
+                path="/test"
+                element={<ProtectedRoute element={<TestPage />} />}
+              />
+              <Route
+                path="/OnlineInterview"
+                element={<ProtectedRoute
+                element={
+                  authToken && meetingId ? (
+                    <MeetingProvider
+                      config={{
+                        meetingId,
+                        micEnabled: true,
+                        webcamEnabled: true,
+                        name,
+                      }}
+                      token={authToken}
+                    >
+                      <MeetingView meetingId={meetingId} onMeetingLeave={onMeetingLeave} />
+                    </MeetingProvider>
+                  ) : (
+                    <JoinScreen getMeetingAndToken={getMeetingAndToken} />
+                  )
+                }/>}
+              />
+              <Route
+                path="/ResultsAndFeedback"
+                element={<ProtectedRoute element={<ResultsAndFeedBack />} />}
+              />
+            </Routes>
+          </AuthProvider>
+        </Router>
+      </MeetingProvider>
+    );
+  }
 export default App;

@@ -1,12 +1,14 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import axios from 'axios';
-import InterviewCard from '../components/card.jsx';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
 import { Link } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:3000';
+
+// Dynamically import the InterviewCard component
+const InterviewCard = lazy(() => import('../components/card.jsx'));
 
 export default function ScheduledInterview() {
   const [details, setDetails] = useState(null);
@@ -47,11 +49,17 @@ export default function ScheduledInterview() {
   return (
     <>
       <Header />
-      <div className="container  min-h-auto mb-14 mt-11">
+      <div className="container min-h-auto mb-20  mt-11">
         <div className="flex space-x-24 overflow-x-auto">
-          {interviews.map((interview) => (
-            <InterviewCard key={interview.id} interview={interview} onStartClick={() => handleStartClick(interview.id)} />
-          ))}
+          <Suspense fallback={<div>Loading...</div>}>
+            {interviews.map((interview) => (
+              <InterviewCard
+                key={interview.id}
+                interview={interview}
+                onStartClick={() => handleStartClick(interview.id)}
+              />
+            ))}
+          </Suspense>
         </div>
       </div>
       {details && (

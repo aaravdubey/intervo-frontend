@@ -1,7 +1,39 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react'
+import { useEffect, useState, useRef } from "react";
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:3000';
 
 export default function CandidateDestailsForm() {
+  const [interview, setInterview] = useState(null);
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No token found in local storage');
+
+        const response = await axios.get(`${API_BASE}/candidate/interviews`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log('Fetched interviews:', response.data);
+
+        // Assume the first interview in the list is the one to display
+        const interviewDetails = Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null;
+        setInterview(interviewDetails);
+      } catch (error) {
+        console.error('Error fetching interviews:', error);
+        setInterview(null); // Set to null in case of error
+      }
+    };
+
+    fetchInterviews();
+  }, []);
+  const Name = interview?.name || 'Name';
+  const email = interview?.email || 'email@gmail.com';
+ 
   return (
     <div>
       <div className="bg-white  rounded-lg p-4  max-w-sm">
@@ -24,13 +56,12 @@ export default function CandidateDestailsForm() {
   <div className='mx-28'>
      
     <p className="text-sm text-center pt-2 text-gray-600">Candidate Name</p>
-    <p className="font-medium text-center">Demo Candidate</p>
+    <p className="font-medium text-center">{Name}</p>
     
     <p className="text-sm text-center pt-4 text-gray-600">Candidate E-mail Id</p>
-    <p className="font-medium text-center">demo@evalground.com</p>
+    <p className="font-medium mt-2 text-center">{email}</p>
     
-    <p className="text-sm text-center pt-4 text-gray-600">Candidate Contact Number</p>
-    <p className="font-medium text-center">+91-9980992834</p>
+
   </div>
 </div>
     </div>
