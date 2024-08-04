@@ -52,6 +52,7 @@ const CSVTable = () => {
       await axios.post("http://localhost:3000/api/storeCandidates", {
         candidates: csvData,
         companyName: batch.companyName,
+        batchId: batch.batchId, // Added batchId here
       });
       toast.success("Candidates stored and emails sent successfully");
     } catch (error) {
