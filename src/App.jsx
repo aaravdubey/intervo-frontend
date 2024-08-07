@@ -10,6 +10,7 @@ import { Home } from './pages/Home';
   import ManageProfile from './components/ManageProfile';
   import Formdetails from './pages/Formdetails';
   import CSVTable from "./components/CSVTable";
+  import Aptitudexam from "./pages/Aptitudexam"
 
 
 
@@ -47,6 +48,7 @@ import Logins from './pages/Logins';
             <Route exact path="/" element={<Home />} />
             <Route exact path="/formdetails" element={<Formdetails />} />
             <Route exact path="/csv-table" element={<CSVTable />} />
+            <Route exact path="/aptiexam" element={<Aptitudexam />} />
             <Route path="/form" element={isAuthenticated ? <BatchForm /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/card" element={isAuthenticated ? <BatchCard /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
