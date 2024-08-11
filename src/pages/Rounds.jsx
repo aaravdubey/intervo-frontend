@@ -7,7 +7,7 @@ export default function Rounds() {
   return (
     <div>
       <Header/>
-      <div className='bg-gray-200'>
+      <div className='bg-gray-200 '>
       <AptitudeHome />
       </div>
       <Footer/>

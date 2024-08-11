@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Logo from "../assets/logo.png";
 import Pattern from "../assets/pattern.png";
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://unishare-backend-six.vercel.app/';
 
 const Login = () => {
   const navigate = useNavigate();

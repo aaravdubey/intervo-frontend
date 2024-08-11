@@ -17,6 +17,7 @@ import DisplayDetails from './components/DisplayDetails';
 import UserValidation from './components/UserValidation';
 import MonitoredSessionDialog from './components/MonitoredSessionDialog';
 import TestPage from './Pages/TestPage';
+import InterviewDetails from './Pages/InterviewDetails.jsx';
 import JoinScreen from './Pages/JoinScreen';
 import MeetingView from './Pages/MeetingView.jsx';
 import ProtectedRoute from './Authentication/ProtectedRoute.jsx'
@@ -122,6 +123,7 @@ function App() {
                 path="/monitor"
                 element={<ProtectedRoute element={<MonitoredSessionDialog />} />}
               />
+               <Route path="/interview-details/:interviewId" element={<ProtectedRoute  element={<InterviewDetails />} />}    />
               <Route
                 path="/test"
                 element={<ProtectedRoute element={<TestPage />} />}

@@ -4,7 +4,7 @@ import Pattern from "../assets/pattern.png";
 export default function Footer() {
   return (
 
-    <footer className="bg-gray-900 relative">
+    <footer className="bg-gray-900  relative">
       <div className="absolute inset-0 bg-cover bg-no-repeat bg-center opacity-5" style={{ backgroundImage: `url(${Pattern})`, filter: 'brightness(0) invert(1)' }}></div>
       <div className="mx-auto w-full max-w-screen-xl p-4 py-14 lg:py-16">
         <div className="md:flex md:justify-between">

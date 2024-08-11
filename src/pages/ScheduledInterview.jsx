@@ -1,31 +1,35 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import axios from 'axios';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:3000';
 
 // Dynamically import the InterviewCard component
 const InterviewCard = lazy(() => import('../components/card.jsx'));
+const SkeletonLoader = lazy(() => import('../components/SkeletonLoader.jsx')); // Import the SkeletonLoader component
 
 export default function ScheduledInterview() {
   const [details, setDetails] = useState(null);
   const [interviews, setInterviews] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInterviews = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token found in local storage');
-
+  
+        // Simulate a network request delay
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds delay
+  
         const response = await axios.get(`${API_BASE}/candidate/interviews`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
+  
         console.log('Fetched interviews:', response.data); // Debugging output
         setInterviews(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
@@ -33,66 +37,38 @@ export default function ScheduledInterview() {
         setInterviews([]); // Set to empty array in case of error
       }
     };
-
+  
     fetchInterviews();
   }, []);
 
-  const handleStartClick = (interviewId) => {
-    const selectedInterview = interviews.find(interview => interview.id === interviewId);
-    setDetails(selectedInterview);
-  };
+  
 
-  const closeDetailsModal = () => {
-    setDetails(null);
+  const handleStartClick = (interviewId) => {
+    navigate(`/interview-details/${interviewId}`);
   };
 
   return (
     <>
       <Header />
-      <div className="container min-h-auto mb-20  mt-11">
-        <div className="flex space-x-24 overflow-x-auto">
-          <Suspense fallback={<div>Loading...</div>}>
-            {interviews.map((interview) => (
-              <InterviewCard
-                key={interview.id}
-                interview={interview}
-                onStartClick={() => handleStartClick(interview.id)}
-              />
-            ))}
+      <div className="container mx-auto min-h-[70vh]   mt-11 px-4">
+        <div className="flex space-x-4 h-full overflow-x-auto py-4">
+          <Suspense fallback={<SkeletonLoader />}>
+            {interviews.length === 0 ? (
+              <SkeletonLoader />  // Show skeleton loader if no interviews are available
+            ) : (
+              interviews.map((interview) => (
+                <InterviewCard
+                
+                  key={interview.id}
+                  interview={interview}
+                  onStartClick={() => handleStartClick(interview.id)}
+                />
+              ))
+            )}
           </Suspense>
         </div>
       </div>
-      {details && (
-        <div id="details-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-            <button
-              type="button"
-              className="absolute top-3 right-3 text-gray-400 hover:bg-gray-200 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
-              onClick={closeDetailsModal}
-            >
-              <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <h2 className="text-xl font-bold mb-4">Details for Interview</h2>
-            <p><strong>Test Time:</strong> {details.testTime}</p>
-            <p><strong>Interview Time:</strong> {details.interviewTime}</p>
-            <p><strong>Status:</strong> {details.status}</p>
-            <p><strong>Score:</strong> {details.score !== null ? details.score : 'N/A'}</p>
-            <p><strong>Interviewer:</strong> {details.interviewer}</p>
-            <div className="mt-4">
-              <Link to='/rounds'>
-                <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mr-12">
-                  Start Aptitude
-                </button>
-              </Link>
-              <button className="bg-green-500 text-white font-bold py-2 px-4 rounded" onClick={() => alert('Interview scheduled')}>
-                Start Interview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
       <Footer />
     </>
   );

@@ -24,7 +24,7 @@ export default function UserValidation() {
     const [interview, setInterview] = useState(null);
     const [isRetake, setIsRetake] = useState(false); // Track if retake is requested
     const [isTabNavigationDisabled, setIsTabNavigationDisabled] = useState(false);
-
+    const [videoLoading, setVideoLoading] = useState(true);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const navigate = useNavigate(); 
@@ -433,7 +433,10 @@ export default function UserValidation() {
                                 <img src={capturedImage} alt="Captured" className="max-w-full max-h-60 mb-4" />
                             ) : (
                                 <>
+                                 
                                     <video ref={videoRef} width="350" height="280" autoPlay onPlay={handleVideoPlay} />
+                                   
+
                                     <canvas ref={canvasRef} className="absolute top-0 left-0" />
                                 </>
                             )}
@@ -467,9 +470,12 @@ export default function UserValidation() {
                         <div className="relative">
                             {idCardCapturedImage ? (
                                 <img src={idCardCapturedImage} alt="Captured ID Card" className="max-w-full max-h-60 mb-4" />
+                                
                             ) : (
-                                <>
+                                <>  
+                               
                                     <video ref={videoRef} width="350" height="280" autoPlay onPlay={handleVideoPlay} />
+                                    
                                     <canvas ref={canvasRef} className="absolute top-0 left-0" />
                                 </>
                             )}
@@ -490,16 +496,22 @@ export default function UserValidation() {
 
     return (
         <>
-            <Header />
-            <div className="flex h-auto bg-gray-100 ">
-                <div className="w-1/3 p-8 bg-white border-2 border-x-slate-400">
-                    {leftPanelContent()}
-                </div>
-                <div className="w-2/3 h-auto mt-11 pl-32 p-8 ">
-                    {!proceeded ? rightPanelContent() : contentAfterProceed()}
-                </div>
-            </div>
-            <Footer />
+             <Header />
+      <div className="flex flex-col min-h-screen bg-gray-100">
+        {/* Container for the two panels */}
+        <div className="flex flex-col lg:flex-row flex-1">
+          {/* Left Panel */}
+          <div className="w-full lg:w-1/3 p-4 lg:p-8 bg-white border-2 border-x-slate-400 lg:border-x-2">
+            {leftPanelContent()}
+          </div>
+
+          {/* Right Panel */}
+          <div className="w-full lg:w-2/3 h-auto mt-4 lg:mt-11 lg:pl-32 p-4 lg:p-0">
+            {!proceeded ? rightPanelContent() : contentAfterProceed()}
+          </div>
+        </div>
+        <Footer />
+      </div>
         </>
     );
 }

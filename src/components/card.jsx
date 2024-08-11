@@ -6,7 +6,7 @@ import { TfiArrowRight } from 'react-icons/tfi';
 
 const InterviewCard = ({ interview, onStartClick }) => {
   return (
-    <div className="p-4 w-1/3 mx-auto border rounded-lg shadow-2xl bg-white">
+    <div className="p-4 w-1/3 mx-auto border rounded-lg h-full shadow-lg  bg-white">
       <img src={interview.imageUrl} alt={interview.title} className="w-full h-50 object-cover rounded-lg" />
       <h2 className="text-lg text-green-500 font-semibold mt-6">Active</h2>
       <h2 className="text-lg  font-semibold mt-6">{interview.title}</h2>
