@@ -5,13 +5,30 @@ import { TiTick } from "react-icons/ti";
 import { MdDone } from "react-icons/md";
 import { SiTicktick } from "react-icons/si";
 import { IoMdTime } from "react-icons/io";
+import Cookies from 'js-cookie';
+import { useEffect } from "react";
 
-
-export default function CardScheduled() {
+export default function CardScheduled({ batch }) {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    try {
+      console.log(batch);
+      Cookies.set('batchId', batch.batchId);
+      navigate('/interview');
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    console.log(batch);
+  }
+  , [])
+
   return (
-    <div onClick={() => navigate('/interview')} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
+    <div onClick={handleClick} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
       <a href="">
         <img className="rounded saturate-50" src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267" alt="" />
       </a>

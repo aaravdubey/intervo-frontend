@@ -6,7 +6,6 @@ import {
 } from "@videosdk.live/react-sdk";
 import { createMeeting, getToken } from './API.js';
 import Loading from './pages/Loading.jsx';
-import NewInterviewPage from './pages/NewInterviewPage.jsx';
 
 const Login = lazy(() => import('./pages/Login'));
 const Interviewer_Home = lazy(() => import('./pages/Interviewer_Home'));
@@ -14,6 +13,7 @@ const InterviewPage = lazy(() => import('./pages/InterviewPage'));
 const MeetingView = lazy(() => import('./pages/MeetingView'));
 const JoinScreen = lazy(() => import('./pages/JoinScreen.jsx'));
 const Preferences = lazy(() => import('./pages/Preferences.jsx'));
+const NewInterviewPage = lazy(() => import('./pages/NewInterviewPage.jsx'));
 
 const App = () => {
   const [meetingId, setMeetingId] = useState(null);

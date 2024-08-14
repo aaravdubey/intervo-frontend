@@ -13,7 +13,7 @@ export default function Modal({ isModalOpen, setIsModalOpen, heading, text, conf
             <div className="sm:flex sm:items-start">
               <div className="mt-3 text-center sm:mt-0 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
-                  Confirm Interview?
+                  Accept Interview Batch?
                 </h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
@@ -24,8 +24,8 @@ export default function Modal({ isModalOpen, setIsModalOpen, heading, text, conf
             </div>
           </div>
           <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-blue text-base font-medium text-white hover:bg-primary-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue sm:ml-3 sm:w-auto sm:text-sm" onClick={() => alert('Confirmed')}>
-              Yes, Confirm
+            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-blue text-base font-medium text-white hover:bg-primary-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-blue sm:ml-3 sm:w-auto sm:text-sm" onClick={onConfirm}>
+              Yes, Accept
             </button>
             <button
               type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-light-blue text-base font-medium text-gray-800 hover:bg-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-blue sm:ml-3 sm:w-auto sm:text-sm" onClick={() => setIsModalOpen(false)}>

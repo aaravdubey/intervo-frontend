@@ -20,7 +20,7 @@ export default function Preferences() {
   const [selectedDays, setSelectedDays] = useState([]);
   const [preferences, setPreferences] = useState({});
 
-  const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const toggleDay = (day) => {
     setSelectedDays((prevSelectedDays) =>
@@ -180,7 +180,7 @@ export default function Preferences() {
                     className={`cursor-pointer w-12 text-center py-2.5 rounded-full border ${selectedDays.includes(day) ? 'bg-teal-blue text-white border-lightbg-teal-blue' : 'bg-gray-100 text-black'}`}
                     onClick={() => toggleDay(day)}
                   >
-                    {day}
+                    {day.slice(0, 3)}
                   </div>
                 ))}
               </div>

@@ -1,12 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../components/card";
 import Footer from "../components/footer";
 import Header from "../components/header";
 import CardScheduled from "../components/cardScheduled";
+import Cookies from 'js-cookie';
+import axios from "axios";
+import { MdSearchOff } from "react-icons/md";
+
 
 
 export default function Interviewer_Home() {
   const [isNewInterviews, setIsNewInterviews] = useState(true);
+  const [newBatches, setNewBatches] = useState([]);
+  const [acceptedBatches, setAcceptedBatches] = useState([]);
+
+  const getNewBatches = async () => {
+    try {
+      const response = await axios.post(`http://localhost:3000/batches/get-new-batches`, { email: Cookies.get('email') });
+      console.log(response.data);
+      setNewBatches(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getAcceptedBatches = async () => {
+    try {
+      const response = await axios.post(`http://localhost:3000/batches/get-accepted-batches`, { email: Cookies.get('email') });
+      console.log(response.data);
+      setAcceptedBatches(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    getNewBatches();
+    getAcceptedBatches();
+  }, [])
 
   return (
     <>
@@ -32,15 +63,20 @@ export default function Interviewer_Home() {
 
 
       {isNewInterviews ?
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-10 px-48 pb-32">
-          <Card />
-          <Card />
+        <section className="flex flex-wrap gap-10 px-48 pb-32">
+          {newBatches.length > 0 ? newBatches.map((batch, index) => (
+            <Card key={index} batch={batch} />
+          )) :
+            <p className="w-full flex justify-center gap-1 items-center py-32 text-gray-400 text-lg">No relevant new batches found <MdSearchOff className="text-xl" /></p>
+          }
         </section>
         :
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-10 px-48 pb-32">
-          <CardScheduled />
-          <CardScheduled />
-          <CardScheduled />
+        <section className="flex flex-wrap gap-10 px-48 pb-32">
+          {acceptedBatches.length > 0 ? acceptedBatches.map((batch, index) => (
+            <CardScheduled key={index} batch={batch} />
+          )) :
+            <p className="w-full flex justify-center gap-1 items-center py-32 text-gray-400 text-lg">No accepted batches found <MdSearchOff className="text-xl" /></p>
+          }
         </section>}
 
       <Footer />
