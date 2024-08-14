@@ -6,6 +6,8 @@ import {
 } from "@videosdk.live/react-sdk";
 import { createMeeting, getToken } from './API.js';
 import Loading from './pages/Loading.jsx';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Login = lazy(() => import('./pages/Login'));
 const Interviewer_Home = lazy(() => import('./pages/Interviewer_Home'));
@@ -39,7 +41,13 @@ const App = () => {
   const getMeetingAndToken = async (id) => {
     const meetingId =
       id == null ? await createMeeting(authToken) : id;
+
+    const response = await axios.post('http://localhost:3000/meeting/setMeetingId', {
+      batchId: Cookies.get('batchId'),
+      meetingId
+    });
     setMeetingId(meetingId);
+    console.log(response);
   };
 
   const onMeetingLeave = () => {

@@ -5,7 +5,9 @@ import Header from "../components/header";
 import { IoMicOffOutline, IoMicOutline } from "react-icons/io5";
 import { IoVideocamOffOutline, IoVideocamOutline } from "react-icons/io5";
 import { useRef } from "react";
-
+import axios from "axios";
+import Cookies from 'js-cookie';
+import { MdError } from "react-icons/md";
 
 
 export default function JoinScreen({ getMeetingAndToken }) {
@@ -21,7 +23,17 @@ export default function JoinScreen({ getMeetingAndToken }) {
   const { checkPermissions, requestPermission, getCameras, getMicrophones, getPlaybackDevices } = useMediaDevice();
 
   const onClick = async () => {
-    await getMeetingAndToken(meetingId);
+    if (Cookies.get("inMeeting") == "true") {
+      return;
+    }
+    const response = await axios.post('http://localhost:3000/meeting/getMeetingId', {
+      batchId: Cookies.get('batchId'),
+      token: Cookies.get('token')
+    });
+    // setMeetingId(response.data.meetingId);
+    // await getMeetingId();
+    console.log(response.data.meetingId);
+    await getMeetingAndToken(response.data.meetingId);
   };
 
   const requestAudioVideoPermission = async () => {
@@ -99,6 +111,23 @@ export default function JoinScreen({ getMeetingAndToken }) {
     }
   }
 
+  const getMeetingId = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/meeting/getMeetingId', {
+        batchId: Cookies.get('batchId'),
+        token: Cookies.get('token')
+      });
+      setMeetingId(response.data.meetingId);
+      console.log(response.data.meetingId);
+      console.log(response);
+
+    } catch (error) {
+      if (error.response.status == 404) {
+        console.log(error);
+      }
+    }
+  }
+
   useEffect(() => {
     requestAudioVideoPermission();
   }, []);
@@ -106,18 +135,13 @@ export default function JoinScreen({ getMeetingAndToken }) {
   return (
     <div className="flex flex-col h-svh">
       <Header />
-      <input
+      {/* <input
         type="text"
         placeholder="Enter Meeting Id"
         onChange={(e) => {
           setMeetingId(e.target.value);
         }}
-      />
-
-
-      <div>
-        <p></p>
-      </div>
+      /> */}
 
       <div className="w-full h-full flex items-center justify-center gap-14 px-28">
         <div className="relative w-3/5 h-[70%]">
@@ -141,13 +165,12 @@ export default function JoinScreen({ getMeetingAndToken }) {
               </div>
             </div>
           </div>
-
-
         </div>
 
         <div className="w-2/5">
           <p className="text-xl font-semibold mb-5">TCS Python Developers Recruitment 2024 Interview</p>
-          <button onClick={onClick} className="block bg-primary-blue text-white w-full p-2 rounded-lg font-semibold">Join</button>
+          <button onClick={onClick} className={`${Cookies.get("inMeeting") == "true" ? "pointer-events-none bg-gray-500 cursor-none " : ""} block bg-primary-blue text-white w-full p-2 rounded-lg font-semibold`}>Join</button>
+          {Cookies.get("inMeeting") == "true" && <p className="mt-2 flex items-center gap-1 text-sm text-red-800"><MdError className="text-base" />Already in meeting!</p>}
         </div>
       </div>
     </div>

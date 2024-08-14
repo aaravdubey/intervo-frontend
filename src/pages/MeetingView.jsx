@@ -3,6 +3,7 @@ import Controls from "../components/Controls";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import ParticipantView from "../components/ParticipantView";
 import Loader from "../components/loader";
+import Cookies from 'js-cookie';
 
 export default function MeetingView(props) {
   const [joined, setJoined] = useState(null);
@@ -36,6 +37,12 @@ export default function MeetingView(props) {
       joinMeeting();
       hasJoinedRef.current = true;
     }
+
+    Cookies.set("inMeeting", true);
+
+    return () => {
+      Cookies.set("inMeeting", false);
+    }
   }, [props.meetingId]);
 
   useEffect(() => {
@@ -53,7 +60,7 @@ export default function MeetingView(props) {
         <div className="h-full flex flex-col box-border">
           <div className="relative flex-grow flex items-center">
             <div className="h-full flex-grow flex  justify-center items-center transition-all duration-500 overflow-hidden p-5 gap-5">
-              {console.log(participants)}
+              {/* {console.log(participants)} */}
               {[...participants.keys()].map((participantId, index) => (
                 <ParticipantView
                   participantId={participantId}

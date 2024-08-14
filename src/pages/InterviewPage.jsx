@@ -14,12 +14,20 @@ export default function InterviewPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [batch, setBatch] = useState({});
+  const [isMeetingTime, setIsMeetingTime] = useState(false);
 
   const getBatch = async () => {
     const response = await axios.post(`http://localhost:3000/batches/get-batch`, { batchId: Cookies.get('batchId'), email: Cookies.get('email') });
     response.data.tableData = JSON.parse(response.data.tableData);
     response.data.schedule = JSON.parse(response.data.schedule);
     console.log(response.data);
+
+    let arr = [];
+    for (let day in response.data.schedule) {
+      arr.push(`${response.data.schedule[day][0]['time']} - ${response.data.schedule[day].at(-1)['time']}`);
+    }
+    const is = isCurrentTimeInRange(arr);
+    setIsMeetingTime(is);
     setBatch(response.data);
   }
 
@@ -28,9 +36,25 @@ export default function InterviewPage() {
     // localStorage.setItem('isNotify', true);
   }
 
+  function isCurrentTimeInRange(ranges) {
+    const currentTime = new Date();
+
+    for (let i = 0; i < ranges.length; i++) {
+      const [start, end] = ranges[i].split(" - ");
+      const startTime = new Date(start);
+      const endTime = new Date(end);
+
+      if (currentTime >= startTime && currentTime <= endTime) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   useEffect(() => {
-    getBatch();
-    // console.log(b);
+    getBatch(); // get batch details  
+
     if (location.state && localStorage.getItem('isNotify') === 'false') {
       notify();
     }
@@ -63,7 +87,7 @@ export default function InterviewPage() {
           ))}
 
           <div className="flex flex-col justify-evenly">
-            <button className="bg-primary-blue hover:brightness-125 text-white px-6 py-2 rounded-full flex items-center justify-center gap-2" onClick={() => navigate('/meeting')}>
+            <button className={`${isMeetingTime ? "bg-primary-blue hover:brightness-125" : "bg-gray-600 cursor-not-allowed pointer-events-none"} bg-primary-blue hover:brightness-125 text-white px-6 py-2 rounded-full flex items-center justify-center gap-2`} onClick={() => navigate('/meeting')}>
               <FaVideo className="text-2xl" />
               <p className="text-xs font-bold">Join Meeting</p>
             </button>
