@@ -6,13 +6,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import Logo from "../assets/logo.png";
 import Pattern from "../assets/pattern.png";
 
-const API_BASE = 'https://unishare-backend-six.vercel.app/';
+const API_BASE = 'http://localhost:3000';
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [email1, setEmail1] = useState('');
   const [password1, setPassword1] = useState('');
+  // eslint-disable-next-line no-unused-vars
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
