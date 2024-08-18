@@ -1,151 +1,215 @@
 import React, { useState, useEffect } from 'react';
-import sampleImage from '../assets/logo.png'; // Import your image
+import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClock } from '@fortawesome/free-solid-svg-icons';
 
 const TestComponent = () => {
-  const [time, setTime] = useState(30 * 60); // 30 minutes in seconds
+  const [time, setTime] = useState(30 * 60); // 30 minutes
+  const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Array(20).fill(null)); // Track user answers
+  const [correctAnswers, setCorrectAnswers] = useState(new Array(20).fill(null)); // Track correct answers
+  const [showResults, setShowResults] = useState(false); // Show results at the end
+  const [fadeClass, setFadeClass] = useState('opacity-100'); // Manage fade transition
 
-  const handleFullscreenChange = () => {
-    if (!document.fullscreenElement) {
-      // Request fullscreen again if it was exited
-      document.documentElement.requestFullscreen().catch(err => {
-        console.error("Failed to re-enter fullscreen mode:", err);
-      });
+  // Fetch 20 random questions from the backend
+  const fetchRandomQuestions = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/questions/random20');
+      setQuestions(response.data);
+      setCorrectAnswers(response.data.map(question => question.correctOption)); // Set correct answers
+      setCurrentIndex(0); // Reset index to start from the first question
+    } catch (error) {
+      console.error('Error fetching random questions:', error);
     }
   };
 
-  const handleBeforeUnload = (event) => {
-    // Prevent refresh or close
-    event.preventDefault();
-    event.returnValue = ''; // Required for most browsers to show confirmation dialog
-  };
+  // Initial load
+  useEffect(() => {
+    fetchRandomQuestions();
+  }, []);
 
-  const handleKeyDown = (event) => {
-    // Prevent page refresh with F5, Ctrl+R and prevent exiting fullscreen with ESC
-    if (event.key === 'F5' || (event.ctrlKey && event.key === 'r') || event.key === 'Escape') {
-      event.preventDefault();
-    }
-  };
-
+  // Timer effect
   useEffect(() => {
     let timerId;
-
     if (time > 0) {
       timerId = setInterval(() => {
         setTime(prevTime => {
           if (prevTime <= 1) {
             clearInterval(timerId);
+            setTime(0);
+            setShowResults(true);
             return 0;
           }
           return prevTime - 1;
         });
-      }, 1000); // Update every second
+      }, 1000);
     } else {
-      clearInterval(timerId); // Ensure timer stops when time runs out
+      clearInterval(timerId);
     }
-
-    return () => {
-      clearInterval(timerId); // Clean up timer on component unmount
-    };
+    return () => clearInterval(timerId);
   }, [time]);
 
-  useEffect(() => {
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('copy', preventCopyPaste);
-    document.addEventListener('paste', preventCopyPaste);
-    document.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('beforeunload', handleBeforeUnload);
+  const handleNextQuestion = () => {
+    setAnsweredQuestions(prev => {
+      const newAnswers = [...prev];
+      newAnswers[currentIndex] = selectedAnswer;
+      return newAnswers;
+    });
 
-    // Clean up event listeners on component unmount
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('copy', preventCopyPaste);
-      document.removeEventListener('paste', preventCopyPaste);
-      document.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Ensure fullscreen request is triggered by user action
-    const requestFullscreen = () => {
-      document.documentElement.requestFullscreen().catch(err => {
-        console.error("Failed to enter fullscreen mode:", err);
-      });
-    };
-
-    // Ensure the request is made after component mounts
-    requestFullscreen();
-
-    return () => {
-      // Optional: Clean up if needed
-    };
-  }, []);
-
-  const preventCopyPaste = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    alert("Copying and pasting is disabled.");
+    setFadeClass('opacity-0');
+    setTimeout(() => {
+      setCurrentIndex(prevIndex => (prevIndex + 1) % questions.length);
+      setSelectedAnswer(null); // Clear selected answer for the new question
+      setFadeClass('opacity-100');
+      if (currentIndex === questions.length - 1) {
+        setShowResults(true); // Show results if it's the last question
+      }
+    }, 300); // Match the duration of the fade-out animation
   };
 
+  const handlePreviousQuestion = () => {
+    // Prevent navigation to previous questions once "Next" is clicked
+    if (currentIndex > 0) {
+      setCurrentIndex(prevIndex => prevIndex - 1);
+      setSelectedAnswer(answeredQuestions[currentIndex - 1] || null);
+    }
+  };
+
+  const handleFinish = () => {
+    setAnsweredQuestions(prev => {
+      const newAnswers = [...prev];
+      newAnswers[currentIndex] = selectedAnswer;
+      return newAnswers;
+    });
+    setShowResults(true);
+  };
+
+  // Calculate progress percentage
+  const calculateProgressPercentage = () => {
+    return ((currentIndex + 1) / questions.length) * 100;
+  };
+
+  // Format time as MM:SS
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? `0${secs}` : secs}`;
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  const handleOptionChange = (event) => {
+    setSelectedAnswer(event.target.value);
+  };
+
+  // Calculate scores
+  const calculateScores = () => {
+    const correctCount = answeredQuestions.reduce((count, answer, index) => {
+      return count + (answer === correctAnswers[index] ? 1 : 0);
+    }, 0);
+    const wrongCount = answeredQuestions.length - correctCount;
+    return { correct: correctCount, wrong: wrongCount };
+  };
+
+  const scores = calculateScores();
+
+  if (showResults) {
+    return (
+      <div className="min-h-screen bg-[#F6F8FE] flex flex-col items-center justify-center py-8 px-4">
+        <main className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg text-center">
+          <h2 className="text-lg font-medium text-[#2D2F48] mb-6">Test Results</h2>
+          <p className="text-lg font-medium text-[#2D2F48] mb-4">Correct Answers: {scores.correct}</p>
+          <p className="text-lg font-medium text-[#2D2F48] mb-4">Wrong Answers: {scores.wrong}</p>
+          <button
+            className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+            onClick={() => window.location.reload()}
+          >
+            Restart Test
+          </button>
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center select-none">
-      <header className="bg-white w-full p-4 flex justify-between items-center shadow">
-        <div className="text-lg font-semibold flex items-center">
-          <img src={sampleImage} alt="Interview Icon" className="h-10 w-28 mr-2" />
+    <div className="min-h-screen bg-[#F6F8FE] flex flex-col items-center justify-between py-8 px-4">
+      <header className="w-full max-w-4xl flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-lg font-medium text-[#2D2F48]">INTERVO</h2>
+          <p className="text-sm text-[#8A8DAB]">Session 1</p>
         </div>
-        <div className="mb-2 text-black">
-          Time Left: {formatTime(time)}
+        <div className="flex items-center space-x-4">
+          <div className="w-64 h-2 bg-[#EDEDF2] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-teal-blue rounded-full transition-all duration-500"
+              style={{ width: `${calculateProgressPercentage()}%` }}
+            ></div>
+          </div>
+          <div className="flex items-center space-x-2 text-sm text-[#8A8DAB]">
+            <FontAwesomeIcon icon={faClock} className="text-teal-blue" />
+            <span>{formatTime(time)} Min</span>
+          </div>
+          <div className="text-sm text-[#8A8DAB]">
+            {Math.round(calculateProgressPercentage())}% Complete
+          </div>
         </div>
-        <div className="text-red-500 cursor-pointer">Finish Test</div>
       </header>
-      <main className="bg-white shadow p-8 m-4 w-4/5 min-h-[600px]">
-        <div className="flex justify-between mb-4">
-          <div>Section #2</div>
-          <div>Attempted: 2/3</div>
-        </div>
-        <div className="flex border-t pt-4">
-          <div className="w-1/2 pr-8 border-r">
-            <h2 className="text-lg font-bold mb-4">Question 1</h2>
-            <p className="mb-4">
-              In order to describe the stable system, what should be the value for gain margin and phase margin?
-            </p>
-            <div className="text-sm text-gray-500 cursor-pointer">Revisit Later</div>
+
+      <main className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg">
+        {questions.length > 0 ? (
+          <div className={`transition-opacity duration-300 ${fadeClass}`}>
+            <h3 className="text-sm font-medium text-[#8A8DAB] mb-4">Question {currentIndex + 1}</h3>
+            <p className="text-lg font-medium text-[#2D2F48] mb-6">{questions[currentIndex].question}</p>
+            <div className="space-y-4">
+              {questions[currentIndex].options.map((option, index) => (
+                <label
+                  key={index}
+                  className={`flex items-center cursor-pointer text-lg bg-[#F6F8FE] p-3 rounded-lg ${selectedAnswer === option ? 'bg-[#EDEDF2]' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="answer"
+                    value={option}
+                    checked={selectedAnswer === option}
+                    onChange={handleOptionChange}
+                    className="hidden"
+                  />
+                  <span className="w-6 h-6 border-2 border-teal-blue rounded-full flex items-center justify-center mr-4">
+                    <span className={`w-3 h-3 ${selectedAnswer === option ? 'bg-teal-blue' : 'hidden'} rounded-full`}></span>
+                  </span>
+                  <span className="text-[#2D2F48]">{option}</span>
+                </label>
+              ))}
+            </div>
           </div>
-          <div className="w-1/2 pl-8">
-            <h2 className="text-lg font-bold mb-4">Select an option</h2>
-            <form>
-              <div className="mb-3 flex items-center">
-                <input type="radio" name="answer" value="positive_positive" className="form-radio" />
-                <label className="ml-2">Positive, Positive</label>
-              </div>
-              <div className="mb-3 flex items-center">
-                <input type="radio" name="answer" value="positive_negative" className="form-radio" />
-                <label className="ml-2">Positive, Negative</label>
-              </div>
-              <div className="mb-3 flex items-center">
-                <input type="radio" name="answer" value="negative_positive" className="form-radio" />
-                <label className="ml-2">Negative, Positive</label>
-              </div>
-              <div className="mb-3 flex items-center">
-                <input type="radio" name="answer" value="negative_negative" className="form-radio" />
-                <label className="ml-2">Negative, Negative</label>
-              </div>
-            </form>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Next</button>
-          </div>
-        </div>
+        ) : (
+          <p>Loading questions...</p>
+        )}
       </main>
-      <footer className="fixed bottom-4 right-4">
-        {/* Optionally add footer content here */}
+
+      <footer className="w-full max-w-4xl flex justify-between mt-6">
+        <button
+          className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+          onClick={handlePreviousQuestion}
+          disabled={currentIndex === 0}
+        >
+          <span className="mr-2">&larr;</span> Previous
+        </button>
+        <button
+          className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+          onClick={handleNextQuestion}
+        >
+          Next <span className="ml-2">&rarr;</span>
+        </button>
+        <button
+          className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+          onClick={handleFinish}
+        >
+          Finish
+        </button>
       </footer>
     </div>
   );
-}
+};
 
 export default TestComponent;

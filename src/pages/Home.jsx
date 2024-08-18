@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Home = () => {
@@ -15,8 +15,27 @@ export const Home = () => {
     }
   };
 
+  // Disable copy and context menu on mount
+  useEffect(() => {
+    const handleCopy = (e) => {
+      e.preventDefault();
+    };
+
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    document.addEventListener('copy', handleCopy);
+    document.addEventListener('contextmenu', handleContextMenu);
+
+    return () => {
+      document.removeEventListener('copy', handleCopy);
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
+
   return (
-    <div className="p-4 min-h-screen bg-gray-100 flex flex-col items-center select-none">
+    <div className="p-4 min-h-screen bg-gray-100 flex flex-col items-center justify-center select-none">
       <h1 className="text-2xl font-bold mb-4">Home</h1>
       <button
         onClick={handleStart}
