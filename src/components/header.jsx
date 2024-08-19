@@ -11,8 +11,9 @@ export default function Header() {
   // Handle logout functionality
   const handleLogout = () => {
     // Clear user authentication tokens or session data
-    localStorage.removeItem('token');
-
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+ 
     // Redirect to the login page
     navigate('/');
   };
