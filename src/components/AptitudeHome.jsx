@@ -107,15 +107,15 @@ export default function AptitudeHome() {
           <div className="flex justify-between mb-4">
             <div>
               <p className="font-semibold">Questions</p>
-              <p>4 Questions</p>
+              <p>20 Questions</p>
             </div>
             <div>
               <p className="font-semibold">Sections</p>
-              <p>2 Sections</p>
+              <p>1 Section</p>
             </div>
             <div>
               <p className="font-semibold">Test Duration</p>
-              <p>60 Minutes</p>
+              <p>30 Minutes</p>
             </div>
           </div>
           <Link to="/Validate">

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
 import axios from 'axios';
 import { IoIosPerson } from "react-icons/io";
 import {jwtDecode} from 'jwt-decode'; // Fix the import
+import Cookies from 'js-cookie';
 
 const API_BASE = 'http://localhost:3000';
 
 export default function InterviewDetails() {
   const [details, setDetails] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInterviewDetails = async () => {
@@ -48,6 +50,7 @@ export default function InterviewDetails() {
     
           // Set interview details
           setDetails({
+            batchId: interviewData.batchId,
             date: date,
             time: time,
             interviewerName: interviewData.interviewerName,
@@ -78,6 +81,11 @@ export default function InterviewDetails() {
     // Logic to start the online interview goes here
     console.log("Online interview started");
   };
+
+  const joinMeeting = () => {
+    Cookies.set("batchId", details.batchId);
+    navigate("/OnlineInterview")
+  }
 
   return (
     <>
@@ -129,14 +137,12 @@ export default function InterviewDetails() {
                 Start Aptitude
               </button>
               </Link>
-              <Link to='/OnlineInterview'>
               <button
-               
+               onClick={joinMeeting}
                 className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
               >
                 Start Online Interview
               </button>
-              </Link>
             </div>
 
           </div>

@@ -1,38 +1,39 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
-import screenfull from 'screenfull'; // Import screenfull
-import {jwtDecode} from 'jwt-decode'; 
+import screenfull from 'screenfull';
+import { jwtDecode } from 'jwt-decode';
 
 const TestPage = () => {
   const [time, setTime] = useState(30 * 60); // 30 minutes
   const [questions, setQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answeredQuestions, setAnsweredQuestions] = useState(new Array(20).fill(null)); // Track user answers
-  const [correctAnswers, setCorrectAnswers] = useState(new Array(20).fill(null)); // Track correct answers
-  const [showResults, setShowResults] = useState(false); // Show results at the end
-  const [fadeClass, setFadeClass] = useState('opacity-100'); // Manage fade transition
+  const [answeredQuestions, setAnsweredQuestions] = useState(new Array(20).fill(null));
+  const [correctAnswers, setCorrectAnswers] = useState(new Array(20).fill(null));
+  const [showResults, setShowResults] = useState(false);
+  const [fadeClass, setFadeClass] = useState('opacity-100');
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
 
-  // Fetch 20 random questions from the backend
   const fetchRandomQuestions = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/questions/random20');
       setQuestions(response.data);
-      setCorrectAnswers(response.data.map(question => question.correctOption)); // Set correct answers
-      setCurrentIndex(0); // Reset index to start from the first question
+      setCorrectAnswers(response.data.map(question => question.correct_option));
+      setCurrentIndex(0);
+      setStartTime(new Date());
     } catch (error) {
       console.error('Error fetching random questions:', error);
     }
   };
 
-  // Initial load
   useEffect(() => {
     fetchRandomQuestions();
   }, []);
 
-  // Timer effect
   useEffect(() => {
     let timerId;
     if (time > 0) {
@@ -42,6 +43,7 @@ const TestPage = () => {
             clearInterval(timerId);
             setTime(0);
             setShowResults(true);
+            setEndTime(new Date());
             return 0;
           }
           return prevTime - 1;
@@ -53,18 +55,17 @@ const TestPage = () => {
     return () => clearInterval(timerId);
   }, [time]);
 
-  // Fullscreen and event handling
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (!screenfull.isFullscreen) {
-        screenfull.request(); // Re-enter fullscreen if exited
+        screenfull.request();
       }
     };
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && screenfull.isFullscreen) {
-        e.preventDefault(); // Prevent default action for Escape key
-        e.stopPropagation(); // Stop event from propagating further
+        e.preventDefault();
+        e.stopPropagation();
       }
     };
 
@@ -78,19 +79,17 @@ const TestPage = () => {
 
     const handleBeforeUnload = (e) => {
       e.preventDefault();
-      e.returnValue = ''; // For browsers to show a warning
+      e.returnValue = '';
     };
 
     const handleTabChange = (e) => {
       e.preventDefault();
     };
 
-    // Enter fullscreen on component mount
     if (screenfull.isEnabled) {
       screenfull.request();
     }
 
-    // Event listeners
     screenfull.on('change', handleFullscreenChange);
     window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('copy', handleCopy);
@@ -119,12 +118,15 @@ const TestPage = () => {
     setTimeout(() => {
       setCurrentIndex(prevIndex => {
         const newIndex = (prevIndex + 1) % questions.length;
-        if (newIndex === 0) setShowResults(true); // Show results if it's the last question
+        if (newIndex === 0) {
+          setShowResults(true);
+          setEndTime(new Date());
+        }
         return newIndex;
       });
-      setSelectedAnswer(null); // Clear selected answer for the new question
+      setSelectedAnswer(null);
       setFadeClass('opacity-100');
-    }, 300); // Match the duration of the fade-out animation
+    }, 300);
   };
 
   const handlePreviousQuestion = () => {
@@ -134,49 +136,41 @@ const TestPage = () => {
     }
   };
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
+    setEndTime(new Date());
+    setShowResults(true);
+    setTimeout(sendResultsToBackend, 0);
+  };
+
+  const sendResultsToBackend = async () => {
     const token = localStorage.getItem('token');
-    
-      const decodedToken = jwtDecode(token);
-      const userid = decodedToken.id;
-      
-    setAnsweredQuestions(prev => {
-      const newAnswers = [...prev];
-      newAnswers[currentIndex] = selectedAnswer;
-      return newAnswers;
-    });
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.id;
   
-    // Calculate correct, wrong answers and other metrics
-    const scores = calculateScores();
-    const correctAnswersCount = scores.correct;
-    const wrongAnswersCount = scores.wrong;
-    const questionsAttempted = answeredQuestions.length;
-    const marksScored = correctAnswersCount * 2; // Assuming 2 marks for each correct answer
-    const percentage = (marksScored / (questionsAttempted * 2)) * 100;
-    const timeTaken = 30 * 60 - time; // Time taken in seconds
-   
-    const testResult = {
-      userId: userid, // Replace with actual user ID
-      correctAnswersCount,
-      wrongAnswersCount,
-      marksScored,
-      questionsAttempted,
-      percentage,
-      timeTaken,
-      startedAt: new Date(Date.now() - timeTaken * 1000), // Calculate the start time
-      endedAt: new Date(),
+    const validStartTime = startTime || new Date();
+    const validEndTime = endTime || new Date();
+  
+    const results = {
+      userId: userId,
+      correctAnswers: calculateScores().correct,
+      questionsAttempted: answeredQuestions.filter(answer => answer !== null).length,
+      timeTaken: Math.max(0, Math.floor((validEndTime - validStartTime) / 1000)),
+      startTime: validStartTime.toISOString(),
+      endTime: validEndTime.toISOString(),
     };
+    
+    console.log(results);
   
     try {
-      // Send the test result to the backend
-      await axios.post('http://localhost:3000/api/questions/test-results', testResult);
-      setShowResults(true);
+      await axios.post('http://localhost:3000/api/questions/submit-results', results, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      console.log('Results sent to backend successfully');
     } catch (error) {
-      console.error('Error sending test results:', error);
+      console.error('Error sending results to backend:', error);
     }
   };
   
-
   const calculateProgressPercentage = () => {
     return questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
   };
@@ -195,25 +189,27 @@ const TestPage = () => {
     const correctCount = answeredQuestions.reduce((count, answer, index) => {
       return count + (answer === correctAnswers[index] ? 1 : 0);
     }, 0);
-    const wrongCount = answeredQuestions.length - correctCount;
+    const wrongCount = answeredQuestions.filter(answer => answer !== null).length - correctCount;
     return { correct: correctCount, wrong: wrongCount };
   };
-
-  const scores = calculateScores();
 
   if (showResults) {
     return (
       <div className="min-h-screen bg-[#F6F8FE] flex flex-col items-center justify-center py-8 px-4">
         <main className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg text-center">
-          <h2 className="text-lg font-medium text-[#2D2F48] mb-6">Test Results</h2>
-          <p className="text-lg font-medium text-[#2D2F48] mb-4">Correct Answers: {scores.correct}</p>
-          <p className="text-lg font-medium text-[#2D2F48] mb-4">Wrong Answers: {scores.wrong}</p>
+          {/* <h2 className="text-lg font-medium text-[#2D2F48] mb-6">Test Results</h2>
+          <p className="text-lg font-medium text-[#2D2F48] mb-4">Correct Answers: {calculateScores().correct}</p>
+          <p className="text-lg font-medium text-[#2D2F48] mb-4">Questions Attempted: {answeredQuestions.filter(answer => answer !== null).length}</p>
+          
+          <p className="text-lg font-medium text-[#2D2F48] mb-4">Time Taken: {formatTime(Math.floor((endTime - startTime) / 1000))}</p> */}
+          <Link to='/ResultsAndFeedback'>
           <button
             className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
-            onClick={() => window.location.reload()}
+           
           >
-            Restart Test
+            View Results
           </button>
+          </Link>
         </main>
       </div>
     );

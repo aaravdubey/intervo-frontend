@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-
+import Cookies from 'js-cookie';
 import Login from './Authentication/Login';
 import {
   MeetingProvider,
@@ -73,8 +73,15 @@ function App() {
   }, [authToken]);
 
   const getMeetingAndToken = async (id) => {
-    const meetingId = id == null ? await createMeeting(authToken) : id;
+    const meetingId =
+      id == null ? await createMeeting(authToken) : id;
+
+    const response = await axios.post('http://localhost:3000/meeting/setMeetingId', {
+      batchId: Cookies.get('batchId'),
+      meetingId
+    });
     setMeetingId(meetingId);
+    console.log(response);
   };
 
   const onMeetingLeave = () => {

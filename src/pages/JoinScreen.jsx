@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import axios from 'axios';
 import { useMediaDevice } from "@videosdk.live/react-sdk";
 import Header from "../components/header";
+
+import Cookies from 'js-cookie';
 import { IoMicOffOutline, IoMicOutline, IoVideocamOffOutline, IoVideocamOutline } from "react-icons/io5";
 
 const API_BASE = 'http://localhost:3000';
@@ -46,7 +48,17 @@ export default function JoinScreen({ getMeetingAndToken }) {
   }, []);
 
   const onClick = async () => {
-    await getMeetingAndToken(meetingId);
+    if (Cookies.get("inMeeting") == "true") {
+      return;
+    }
+    const response = await axios.post('http://localhost:3000/meeting/getMeetingId', {
+      batchId: Cookies.get('batchId'),
+      token: Cookies.get('token')
+    });
+    // setMeetingId(response.data.meetingId);
+    // await getMeetingId();
+    console.log(response.data.meetingId);
+    await getMeetingAndToken(response.data.meetingId);
   };
 
   const requestAudioVideoPermission = async () => {
@@ -136,13 +148,7 @@ export default function JoinScreen({ getMeetingAndToken }) {
   return (
     <div className="flex flex-col h-svh">
       <Header />
-      <input
-        type="text"
-        placeholder="Enter Meeting Id"
-        onChange={(e) => {
-          setMeetingId(e.target.value);
-        }}
-      />
+    
 
       <div>
         <p></p>
