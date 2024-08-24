@@ -12,7 +12,7 @@ export default function ResultsAndFeedBack() {
     <div className='min-h-screen'>
         <Header/>
       
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto mb-24 p-4">
       
       
       <div className="grid grid-cols-1 md:grid-cols-2 mb-4 gap-6">
@@ -36,10 +36,10 @@ export default function ResultsAndFeedBack() {
         </div>
 
         {/* Section-wise Performance Analysis */}
-        <div className="bg-white rounded-lg shadow-xl p-4 col-span-2">
+        {/* <div className="bg-white rounded-lg shadow-xl p-4 col-span-2">
           
          <SectionPerformance/>
-        </div>
+        </div> */}
       </div>
     </div>
       <Footer/>

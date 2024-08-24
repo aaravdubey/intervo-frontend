@@ -4,7 +4,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import screenfull from 'screenfull';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 const TestPage = () => {
   const [time, setTime] = useState(30 * 60); // 30 minutes
@@ -27,6 +27,15 @@ const TestPage = () => {
       setStartTime(new Date());
     } catch (error) {
       console.error('Error fetching random questions:', error);
+    }
+  };
+
+  const callFlaskModel = async () => {
+    try {
+      await axios.get('http://localhost:5000/api/monitor'); // Replace with your Flask model endpoint
+      console.log('Flask model called successfully');
+    } catch (error) {
+      console.error('Error calling Flask model:', error);
     }
   };
 
@@ -105,6 +114,10 @@ const TestPage = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('visibilitychange', handleTabChange);
     };
+  }, []);
+
+  useEffect(() => {
+    callFlaskModel();
   }, []);
 
   const handleNextQuestion = () => {
@@ -205,7 +218,6 @@ const TestPage = () => {
           <Link to='/ResultsAndFeedback'>
           <button
             className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
-           
           >
             View Results
           </button>
