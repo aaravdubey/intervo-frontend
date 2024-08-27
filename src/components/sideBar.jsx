@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoHomeSharp } from "react-icons/io5";
 import { GrSchedules } from "react-icons/gr";
 import { FiEdit3 } from "react-icons/fi";
@@ -7,8 +7,36 @@ import { BsPersonLinesFill } from "react-icons/bs";
 import { MdOutlineGrade } from "react-icons/md";
 import Logo from '../assets/logo-white.png'
 import { Link } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
+const API_BASE = 'http://localhost:3000';
+
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [resultsAvailable, setResultsAvailable] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+      
+      axios.post(`${API_BASE}/candidate/result-status`, { userId })
+        .then(response => {
+          setResultsAvailable(response.data.resultsAvailable);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Error checking results availability:', err);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -98,12 +126,20 @@ export default function Sidebar() {
               </Link>
             </li>
             <li>
-              <Link to='/Rounds'
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 group"
-              >
-               <FiEdit3/>
-                <span className="ms-3">Aptitude Test</span>
-              </Link>
+              {loading ? (
+                <span className="flex items-center p-2 text-gray-400">Loading...</span>
+              ) : (
+                <Link
+                  to='/Rounds'
+                  className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white ${
+                    resultsAvailable ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-500'
+                  } group`}
+                  onClick={(e) => resultsAvailable && e.preventDefault()}
+                >
+                  <FiEdit3/>
+                  <span className="ms-3">Aptitude Test</span>
+                </Link>
+              )}
             </li>
            
             <li>

@@ -39,7 +39,7 @@ export default function CandidateDestailsForm() {
       <div className="bg-white  rounded-lg p-4  max-w-sm">
   <div className="flex items-center mx- mb-4">
   <div className=" bg-teal-blue w- rounded-lg p-2 top-0 mr-3">
-      <svg className="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
       </svg>
     </div>
@@ -53,13 +53,13 @@ export default function CandidateDestailsForm() {
       </svg>
     </div>
   </div>
-  <div className='mx-28'>
+  <div className='mx-auto w-full'>
      
     <p className="text-sm text-center pt-2 text-gray-600">Candidate Name</p>
     <p className="font-medium text-center">{Name}</p>
     
     <p className="text-sm text-center pt-4 text-gray-600">Candidate E-mail Id</p>
-    <p className="font-medium mt-2 text-center">{email}</p>
+    <p className="font-medium mt-2 w-full text-center">{email}</p>
     
 
   </div>

@@ -4,13 +4,15 @@ import Header from '../components/header.jsx';
 import Footer from '../components/footer.jsx';
 import axios from 'axios';
 import { IoIosPerson } from "react-icons/io";
-import {jwtDecode} from 'jwt-decode'; // Fix the import
+import {jwtDecode} from 'jwt-decode';
 import Cookies from 'js-cookie';
 
 const API_BASE = 'http://localhost:3000';
 
 export default function InterviewDetails() {
   const [details, setDetails] = useState(null);
+  const [resultsAvailable, setResultsAvailable] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,11 +22,12 @@ export default function InterviewDetails() {
         if (token) {
           const decodedToken = jwtDecode(token);
           const email = decodedToken.email;
+          const userId = decodedToken.id;
           console.log("Decoded email:", email);
     
           // Fetch interview details using the email
-          const response = await axios.post(`${API_BASE}/candidate/interviewsdetails`, { email });
-          const interviewData = response.data;
+          const interviewResponse = await axios.post(`${API_BASE}/candidate/interviewsdetails`, { email });
+          const interviewData = interviewResponse.data;
           
           // Extract date and time strings
           const dateStr = interviewData.date;
@@ -57,98 +60,92 @@ export default function InterviewDetails() {
             position: interviewData.position,
             type: interviewData.type
           });
-        } else {
-          console.error("Token not found in localStorage.");
+
+          // Check results availability
+          const resultResponse = await axios.post(`${API_BASE}/candidate/result-status`, { userId });
+          console.log("RESULT",resultResponse)
+          setResultsAvailable(resultResponse.data.resultsAvailable);
         }
       } catch (error) {
-        console.error('Error fetching interview details:', error);
+        console.error('Error fetching interview details or checking results:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchInterviewDetails();
   }, []);
   
-  if (!details) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
+  if (!details) {
+    return <div>No interview details available.</div>;
+  }
+
   const handleStartAptitude = () => {
-    // Logic to start the aptitude test goes here
-    console.log("Aptitude test started");
+   navigate('/Rounds')
   };
 
   const handleStartOnlineInterview = () => {
-    // Logic to start the online interview goes here
-    console.log("Online interview started");
+    navigate('/OnlineInterview')
   };
 
   const joinMeeting = () => {
     Cookies.set("batchId", details.batchId);
-    navigate("/OnlineInterview")
-  }
+    // Pass the date and time as props using the state object in navigate
+    navigate("/OnlineInterview", { state: { date: details.date, time: details.time } });
+  };
 
   return (
     <>
       <Header />
-      <div className="flex flex-col min-h-screen">
-        <div className="flex-1 px-4 mb-24 mt-14 py-8">
-          <div className="bg-white rounded-lg shadow-xl cursor-pointer hover:shadow-stone-400 max-h-full max-w-xl p-2 mx-auto">
-            <h2 className="text-xl font-semibold mb-4 mt-6 p-3 flex items-center">
-              <span className="text-blue-500 mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </span>
-              Scheduled Interview
-            </h2>
-            <h2 className="text-xl font-semibold mb-4 mt-6 p-3 flex items-center">
-              Interviewer
-            </h2>
-            <div className="flex  mb-7 items-center">
-              <div className="rounded-full mx-2">
-                <IoIosPerson size={56} />
-              </div>
-              <div>
-                <p className="font-semibold">{details.interviewerName}</p>
-                <p className="text-sm text-gray-600">
-                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                  {details.position} [Online Interview]
-                </p>
+      <div className="flex flex-col max-h-screen">
+      <div className="flex-1 px-4 mb-20  mt-14 py-8">
+      <div className="bg-white rounded-lg p-11 shadow-2xl cursor-pointer hover:shadow-stone-400 max-h-full max-w-xl  mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Scheduled Interview</h2>
+            <div className="mb-8">
+              <h3 className="text-lg mt-11 font-semibold">Interviewer</h3>
+              <div className="flex items-center mt-2">
+                <IoIosPerson className="text-3xl mr-2" />
+                <div>
+                  <p className="font-medium">{details.interviewerName}</p>
+                  <p className="text-sm text-gray-600">
+                    {details.position} [Online Interview]
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="mb-24">
-              <p className="text-gray-600 mx-5  flex items-center">
-                <span className="text-indigo-500 mr-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                </span>
-                {details.date}, {details.time} {/* Show formatted date and time */}
+            <div className="mb-6">
+              <p className="flex items-center">
+                <span className="mr-2">📅</span>
+                {details.date}, {details.time}
               </p>
             </div>
 
             {/* Buttons for starting aptitude and online interview */}
-            <div className="flex justify-around mt-6 mb-4">
-              <Link to='/rounds'>
+            <div className="flex mt-12 space-x-32">
               <button
-                
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
+                onClick={handleStartAptitude}
+                className={`px-4 py-2 bg-blue-500 rounded-lg text-white  hover:bg-blue-600 ${
+                  resultsAvailable ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                disabled={resultsAvailable}
               >
                 Start Aptitude
               </button>
-              </Link>
               <button
-               onClick={joinMeeting}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
+                onClick={handleStartOnlineInterview}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
               >
                 Start Online Interview
               </button>
             </div>
-
           </div>
         </div>
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 }

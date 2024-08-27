@@ -6,6 +6,8 @@ import { faClock } from '@fortawesome/free-solid-svg-icons';
 import screenfull from 'screenfull';
 import {jwtDecode} from 'jwt-decode';
 
+
+
 const TestPage = () => {
   const [time, setTime] = useState(30 * 60); // 30 minutes
   const [questions, setQuestions] = useState([]);
@@ -15,8 +17,8 @@ const TestPage = () => {
   const [correctAnswers, setCorrectAnswers] = useState(new Array(20).fill(null));
   const [showResults, setShowResults] = useState(false);
   const [fadeClass, setFadeClass] = useState('opacity-100');
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
   const fetchRandomQuestions = async () => {
     try {
@@ -29,6 +31,30 @@ const TestPage = () => {
       console.error('Error fetching random questions:', error);
     }
   };
+
+  useEffect(() => {
+    fetchRandomQuestions();
+  }, []);
+
+
+  useEffect(() => {
+    let timerId;
+    if (time > 0) {
+      timerId = setInterval(() => {
+        setTime(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(timerId);
+            handleFinish();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(timerId);
+    }
+    return () => clearInterval(timerId);
+  }, [time]);
 
   const callFlaskModel = async () => {
     try {
@@ -43,26 +69,26 @@ const TestPage = () => {
     fetchRandomQuestions();
   }, []);
 
-  useEffect(() => {
-    let timerId;
-    if (time > 0) {
-      timerId = setInterval(() => {
-        setTime(prevTime => {
-          if (prevTime <= 1) {
-            clearInterval(timerId);
-            setTime(0);
-            setShowResults(true);
-            setEndTime(new Date());
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-    } else {
-      clearInterval(timerId);
-    }
-    return () => clearInterval(timerId);
-  }, [time]);
+  // useEffect(() => {
+  //   let timerId;
+  //   if (time > 0) {
+  //     timerId = setInterval(() => {
+  //       setTime(prevTime => {
+  //         if (prevTime <= 1) {
+  //           clearInterval(timerId);
+  //           setTime(0);
+  //           setShowResults(true);
+  //           setEndTime(new Date());
+  //           return 0;
+  //         }
+  //         return prevTime - 1;
+  //       });
+  //     }, 1000);
+  //   } else {
+  //     clearInterval(timerId);
+  //   }
+  //   return () => clearInterval(timerId);
+  // }, [time]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -121,41 +147,45 @@ const TestPage = () => {
   }, []);
 
   const handleNextQuestion = () => {
+    saveCurrentAnswer();
+    navigateToQuestion(currentIndex + 1);
+  };
+  
+  const handlePreviousQuestion = () => {
+    saveCurrentAnswer();
+    navigateToQuestion(currentIndex - 1);
+  };
+  const saveCurrentAnswer = (callback) => {
     setAnsweredQuestions(prev => {
       const newAnswers = [...prev];
       newAnswers[currentIndex] = selectedAnswer;
+      if (callback) callback(newAnswers);
       return newAnswers;
     });
+  };
 
+  const navigateToQuestion = (newIndex) => {
     setFadeClass('opacity-0');
     setTimeout(() => {
-      setCurrentIndex(prevIndex => {
-        const newIndex = (prevIndex + 1) % questions.length;
-        if (newIndex === 0) {
-          setShowResults(true);
-          setEndTime(new Date());
-        }
-        return newIndex;
-      });
-      setSelectedAnswer(null);
+      setCurrentIndex(newIndex);
+      setSelectedAnswer(answeredQuestions[newIndex]);
       setFadeClass('opacity-100');
     }, 300);
   };
-
-  const handlePreviousQuestion = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(prevIndex => prevIndex - 1);
-      setSelectedAnswer(answeredQuestions[currentIndex - 1] || null);
-    }
-  };
-
+  
   const handleFinish = () => {
-    setEndTime(new Date());
-    setShowResults(true);
-    setTimeout(sendResultsToBackend, 0);
+    saveCurrentAnswer((updatedAnswers) => {
+      console.log('Final Answered Questions:', updatedAnswers);
+      setShowResults(true);
+      setEndTime(new Date());
+      sendResultsToBackend(updatedAnswers);
+    });
   };
+  
+  
 
-  const sendResultsToBackend = async () => {
+  const sendResultsToBackend = async (finalAnswers) => {
+    const validAnsweredQuestions = finalAnswers.filter(answer => answer !== null);
     const token = localStorage.getItem('token');
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.id;
@@ -166,12 +196,11 @@ const TestPage = () => {
     const results = {
       userId: userId,
       correctAnswers: calculateScores().correct,
-      questionsAttempted: answeredQuestions.filter(answer => answer !== null).length,
+      questionsAttempted: validAnsweredQuestions.length,
       timeTaken: Math.max(0, Math.floor((validEndTime - validStartTime) / 1000)),
       startTime: validStartTime.toISOString(),
       endTime: validEndTime.toISOString(),
     };
-    
     console.log(results);
   
     try {
@@ -183,9 +212,13 @@ const TestPage = () => {
       console.error('Error sending results to backend:', error);
     }
   };
+
   
   const calculateProgressPercentage = () => {
-    return questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+    const totalMarks = 40; // Total marks for the test
+    const questionsAttempted = answeredQuestions.filter(answer => answer !== null).length;
+    const marksAttempted = questionsAttempted * 2; // Each question is worth 2 marks
+    return (marksAttempted / totalMarks) * 100;
   };
 
   const formatTime = (seconds) => {
@@ -210,11 +243,7 @@ const TestPage = () => {
     return (
       <div className="min-h-screen bg-[#F6F8FE] flex flex-col items-center justify-center py-8 px-4">
         <main className="w-full max-w-4xl bg-white p-8 rounded-xl shadow-lg text-center">
-          {/* <h2 className="text-lg font-medium text-[#2D2F48] mb-6">Test Results</h2>
-          <p className="text-lg font-medium text-[#2D2F48] mb-4">Correct Answers: {calculateScores().correct}</p>
-          <p className="text-lg font-medium text-[#2D2F48] mb-4">Questions Attempted: {answeredQuestions.filter(answer => answer !== null).length}</p>
           
-          <p className="text-lg font-medium text-[#2D2F48] mb-4">Time Taken: {formatTime(Math.floor((endTime - startTime) / 1000))}</p> */}
           <Link to='/ResultsAndFeedback'>
           <button
             className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
@@ -283,27 +312,34 @@ const TestPage = () => {
         )}
       </main>
 
+      
       <footer className="w-full max-w-4xl flex justify-between mt-6">
-        <button
-          className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
-          onClick={handlePreviousQuestion}
-          disabled={currentIndex === 0}
-        >
-          <span className="mr-2">&larr;</span> Previous
-        </button>
-        <button
-          className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
-          onClick={handleNextQuestion}
-        >
-          Next <span className="ml-2">&rarr;</span>
-        </button>
-        <button
-          className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
-          onClick={handleFinish}
-        >
-          Finish
-        </button>
+        {currentIndex > 0 && (
+          <button
+            className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+            onClick={handlePreviousQuestion}
+          >
+            <span className="mr-2">&larr;</span> Previous
+          </button>
+        )}
+        
+        {currentIndex < 19 ? (
+          <button
+            className="flex items-center text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+            onClick={handleNextQuestion}
+          >
+            Next <span className="ml-2">&rarr;</span>
+          </button>
+        ) : (
+          <button
+            className="text-lg text-white bg-teal-blue px-6 py-2 rounded-lg transition-transform transform hover:scale-105"
+            onClick={handleFinish}
+          >
+            Finish
+          </button>
+        )}
       </footer>
+
     </div>
   );
 };

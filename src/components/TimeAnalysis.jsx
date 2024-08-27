@@ -7,13 +7,13 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 // Register the components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-export default function TimeAnalysis({ correctAnswers, wrongAnswers }) {
+export default function TimeAnalysis({ correctAnswersCount, wrongAnswersCount }) {
     const data = {
         labels: ['Correct Answers', 'Wrong Answers'],
         datasets: [
           {
             label: 'Number of Answers',
-            data: [correctAnswers, wrongAnswers],
+            data: [correctAnswersCount, wrongAnswersCount],
             backgroundColor: ['#4caf50', '#f44336'],
             borderColor: ['#388e3c', '#d32f2f'],
             borderWidth: 1,
