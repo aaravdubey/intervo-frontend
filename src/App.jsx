@@ -22,6 +22,7 @@ import { Home } from './pages/Home';
   } from "react-router-dom"
 import Interviewer_Home from './pages/Interviewer_Home';
 import Logins from './pages/Logins';
+import Dashboard from './components/Dashboard';
 
 
 
@@ -47,6 +48,7 @@ import Logins from './pages/Logins';
         <Route exact path="/logins" element={<Logins />} /> */}
             <Route exact path="/" element={<Home />} />
             <Route exact path="/formdetails" element={<Formdetails />} />
+            <Route exact path="/dashboard" element={<Dashboard />} />
             <Route exact path="/csv-table" element={<CSVTable />} />
             <Route exact path="/aptiexam" element={<Aptitudexam />} />
             <Route path="/form" element={isAuthenticated ? <BatchForm /> : <Login setIsAuthenticated={setIsAuthenticated} />} />

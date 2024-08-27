@@ -5,6 +5,7 @@ import Logo from "../assets/logo.png";
 import Pattern from "../assets/pattern.png";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Dashboard from '../components/Dashboard';
 
 const API_BASE = 'http://localhost:3000';
 
@@ -34,6 +35,26 @@ const Login = ({ setIsAuthenticated }) => {
       setVisible(false);
       setIsLogin(!isLogin);
     }, 250);
+  };
+
+  // Handle login form submission
+  const signIn = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(`${API_BASE}/api/account/signin`, { email, password });
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('companyName', data.companyName); // Store company name
+        localStorage.setItem('isAuthenticated', 'true'); // Save authentication state
+        setIsAuthenticated(true);
+        navigate('/dashboard');
+        toast.success('Login successful!');
+      }
+    } catch (error) {
+      console.error('Error during signin:', error);
+      toast.error('Invalid credentials');
+    }
   };
 
   const sendOtp = async () => {
@@ -76,6 +97,7 @@ const Login = ({ setIsAuthenticated }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username);
         localStorage.setItem('companyName', data.companyName); // Store company name
+        localStorage.setItem('isAuthenticated', 'true'); // Save authentication state
         setIsAuthenticated(true);
         navigate('/form');
         toast.success('Signup successful!');
@@ -86,25 +108,6 @@ const Login = ({ setIsAuthenticated }) => {
     } catch (error) {
       console.error('Error during signup:', error);
       toast.error('Error during signup');
-    }
-  };
-
-  // Handle login form submission
-  const signIn = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post(`${API_BASE}/api/account/signin`, { email, password });
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('companyName', data.companyName); // Store company name
-        setIsAuthenticated(true);
-        navigate('/card');
-        toast.success('Login successful!');
-      }
-    } catch (error) {
-      console.error('Error during signin:', error);
-      toast.error('Invalid credentials');
     }
   };
 
@@ -195,16 +198,14 @@ const Login = ({ setIsAuthenticated }) => {
                 </div>
                 <div className="py-2">
                   <span className="mb-2 text-md">Username</span>
-                  <div className='flex'>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
-                      name="username"
-                      id="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                    name="username"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
                 </div>
                 <div className="py-2">
                   <span className="mb-2 text-md">Email</span>
@@ -221,41 +222,39 @@ const Login = ({ setIsAuthenticated }) => {
                   <span className="mb-2 text-md">Password</span>
                   <input
                     type="password"
-                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                     name="signupPassword"
                     id="signupPassword"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   />
                 </div>
-                <div className="py-4">
-                  {isOtpSent ? (
-                    <>
-                      <span className="mb-2 text-md">OTP</span>
-                      <input
-                        type="text"
-                        className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
-                        name="otp"
-                        id="otp"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                      />
-                      <button
-                        className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 mt-4 border hover:border-gray-300 hover:bg-dark-blue"
-                        onClick={verifyOtp}
-                      >
-                        Verify OTP
-                      </button>
-                    </>
-                  ) : (
+                {isOtpSent ? (
+                  <div className="py-2">
+                    <span className="mb-2 text-md">Enter OTP</span>
+                    <input
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                      name="otp"
+                      id="otp"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                    />
                     <button
                       className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
-                      onClick={sendOtp}
+                      onClick={verifyOtp}
                     >
-                      Send OTP
+                      Verify OTP
                     </button>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <button
+                    className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border hover:border-gray-300 hover:bg-dark-blue"
+                    onClick={sendOtp}
+                  >
+                    Send OTP
+                  </button>
+                )}
               </form>
               <div className="text-center text-gray-400">
                 Already have an account?
