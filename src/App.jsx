@@ -21,10 +21,15 @@ const App = () => {
   const [meetingId, setMeetingId] = useState(null);
   const [authToken, setAuthToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  let name = "User";
 
   useEffect(() => {
     const fetchToken = async () => {
       try {
+        if (Cookies.get('name') != null || Cookies.get("email") != "") {
+          name = Cookies.get('name') ;
+        }
+        
         const token = await getToken();
         setAuthToken(token);
       } catch (error) {
@@ -82,7 +87,7 @@ const App = () => {
                   meetingId,
                   micEnabled: true,
                   webcamEnabled: true,
-                  name: "User X",
+                  name: name,
                 }}
                 token={authToken}
               >

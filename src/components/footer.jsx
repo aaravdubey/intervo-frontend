@@ -15,13 +15,13 @@ export default function Footer() {
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
             <div>
-              <h2 className="mb-6 text-sm font-semibold text-white uppercase">Resources</h2>
+              <h2 className="mb-6 text-sm font-semibold text-white uppercase">Links</h2>
               <ul className="text-gray-100 font-medium">
                 <li className="mb-4">
-                  <a href="https://flowbite.com/" className="hover:underline">Flowbite</a>
+                  <a href="https://flowbite.com/" className="hover:underline">Home</a>
                 </li>
                 <li>
-                  <a href="https://tailwindcss.com/" className="hover:underline">Tailwind CSS</a>
+                  <a href="https://tailwindcss.com/" className="hover:underline">Preferences</a>
                 </li>
               </ul>
             </div>

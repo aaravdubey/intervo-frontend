@@ -21,6 +21,7 @@ export default function JoinScreen({ getMeetingAndToken }) {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const { checkPermissions, requestPermission, getCameras, getMicrophones, getPlaybackDevices } = useMediaDevice();
+  const [isJoined, setIsJoined] = useState(false);
 
   const onClick = async () => {
     if (Cookies.get("inMeeting") == "true") {
@@ -111,24 +112,26 @@ export default function JoinScreen({ getMeetingAndToken }) {
     }
   }
 
-  const getMeetingId = async () => {
-    try {
-      const response = await axios.post('http://localhost:3000/meeting/getMeetingId', {
-        batchId: Cookies.get('batchId'),
-        token: Cookies.get('token')
-      });
-      setMeetingId(response.data.meetingId);
-      console.log(response.data.meetingId);
-      console.log(response);
+  // const getMeetingId = async () => {
+  //   try {
+  //     const response = await axios.post('http://localhost:3000/meeting/getMeetingId', {
+  //       batchId: Cookies.get('batchId'),
+  //       token: Cookies.get('token')
+  //     });
+  //     setMeetingId(response.data.meetingId);
+  //     console.log(response.data.meetingId);
+  //     console.log(response);
 
-    } catch (error) {
-      if (error.response.status == 404) {
-        console.log(error);
-      }
-    }
-  }
+  //   } catch (error) {
+  //     if (error.response.status == 404) {
+  //       console.log(error);
+  //     }
+  //   }
+  // }
 
   useEffect(() => {
+    if (Cookies.get("inMeeting") == "true") setIsJoined(true);
+    else setIsJoined(false);
     requestAudioVideoPermission();
   }, []);
 
@@ -169,8 +172,8 @@ export default function JoinScreen({ getMeetingAndToken }) {
 
         <div className="w-2/5">
           <p className="text-xl font-semibold mb-5">TCS Python Developers Recruitment 2024 Interview</p>
-          <button onClick={onClick} className={`${Cookies.get("inMeeting") == "true" ? "pointer-events-none bg-gray-500 cursor-none " : ""} block bg-primary-blue text-white w-full p-2 rounded-lg font-semibold`}>Join</button>
-          {Cookies.get("inMeeting") == "true" && <p className="mt-2 flex items-center gap-1 text-sm text-red-800"><MdError className="text-base" />Already in meeting!</p>}
+          <button onClick={onClick} className={`${isJoined ? "pointer-events-none bg-gray-500 cursor-none " : ""} block bg-primary-blue text-white w-full p-2 rounded-lg font-semibold`}>Join</button>
+          {isJoined && <p className="mt-2 flex items-center gap-1 text-sm text-red-800"><MdError className="text-base" />Already in meeting!</p>}
         </div>
       </div>
     </div>

@@ -14,7 +14,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
+html {
+  scrollbar-width: thin;
+  /* Make scrollbar thinner */
+  scrollbar-color: #fefefe #d8d9dd;
+  /* Thumb and track colors */
+  scroll-behavior: smooth;
+}
 
 .lds-facebook,
 .lds-facebook div {

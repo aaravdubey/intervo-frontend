@@ -25,16 +25,16 @@ export default function CardScheduled({ batch }) {
   useEffect(() => {
     console.log(batch);
   }
-  , [])
+    , [])
 
   return (
-    <div onClick={handleClick} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded">
+    <div onClick={handleClick} className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded h-fit">
       <a href="">
         <img className="rounded saturate-50" src="https://verpex.com/assets/uploads/images/blog/Python-good-for-machine-learning.webp?v=1681274267" alt="" />
       </a>
       <div className="py-4 px-2">
         <a href="#">
-          <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">TCS Python Developers Recruitment 2024</h5>
+          <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">{batch.domains} Recruitment</h5>
         </a>
         <div className="w-full flex justify-between mb-2 font-normal text-sm text-gray-800">
           <p>Tests</p>
@@ -42,14 +42,18 @@ export default function CardScheduled({ batch }) {
         </div>
         <div className="w-full flex justify-between mb-3 font-normal text-sm text-gray-800">
           <p>Interviews</p>
-          <p>0/25</p>
+          <p>0/{batch.candidates.length}</p>
         </div>
         <div className="flex justify-between">
 
-          <span className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">react</span>
+          <div className="flex flex-wrap gap-1">
+            {batch.skills.map((skill, index) => (
+              <span key={index} className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">{skill}</span>
+            ))}
+          </div>
           <div className="flex items-center gap-0.5 text-slate-500">
             <IoPersonSharp />
-            <span className="text-sm">25</span>
+            <span className="text-sm">{batch.candidates.length}</span>
           </div>
         </div>
       </div>

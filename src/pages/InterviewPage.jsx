@@ -111,8 +111,8 @@ export default function InterviewPage() {
                 <th className="px-3 py-5 w-2/6">Name</th>
                 <th className="px-3 py-5 w-2/6">Email</th>
                 <th className="px-3 py-5 w-1/6">Sex</th>
-                <th className="px-3 py-5 w-1/6">Test Score</th>
-                <th className="px-3 py-5 w-1/6">Interview Score</th>
+                <th className="px-3 py-5 w-1/6">Test status</th>
+                <th className="px-3 py-5 w-1/6">Interview status</th>
               </tr>
             </thead>
           </table>
@@ -121,12 +121,13 @@ export default function InterviewPage() {
               <tbody className="bg-grey-light items-center justify-between w-full">
                 {batch.tableData?.map((candidate, index) => (
                   <tr key={index} className="flex w-full border-b border-gray-300 h-min">
+                    {typeof batch.candidates[index].interviewScore === 'object' && console.log(Object.keys(batch.candidates[index]?.interviewScore).length > 0)}
                     <td className="px-3 py-5 w-1/6">{index + 1}</td>
                     <td className="px-3 py-5 pl-3 w-2/6">{candidate.name}</td>
-                    <td className="px-3 py-5 pl-3 w-2/6">{candidate.email}</td>
-                    <td className="px-3 py-5 pl-4 w-1/6">{candidate.sex}</td>
-                    <td className="px-3 py-5 pl-5 w-1/6">5</td>
-                    <td className="px-3 py-5 pl-4 w-1/6">pending</td>
+                    <td className="px-3 py-5 pl-4 w-2/6">{candidate.email}</td>
+                    <td className="px-3 py-5 pl-6 w-1/6">{candidate.sex}</td>
+                    <td className="px-3 py-5 pl-8 w-1/6"> <span className="text-green-600">completed</span></td>
+                    <td className="px-3 py-5 pl-8 w-1/6">{typeof batch.candidates[index].interviewScore === 'object' && Object.keys(batch.candidates[index]?.interviewScore).length > 0 ? <span className="text-green-600">completed</span> : "pending"}</td>
                   </tr>
                 ))}
               </tbody>

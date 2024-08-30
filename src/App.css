@@ -1,1 +1,36 @@
 #root {}
+
+.upload-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  padding: 2rem;
+  border-width: 2px;
+  border-radius: 2px;
+  border-color: #dfdfdf;
+  border-style: dashed;
+  background-color: #fafafa;
+  /* font-size: large; */
+  color: #bdbdbd;
+  outline: none;
+  transition: border .24s ease-in-out;
+}
+
+.focused-style {
+  border-color: #99cffc
+}
+
+.accept-style {
+  border-color: #8dffc8
+}
+
+.reject-style {
+  border-color: #fb859d
+}
+
+.red-alert {
+  color: #ff708d !important;
+}

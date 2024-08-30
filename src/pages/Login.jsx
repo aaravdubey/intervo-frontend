@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 // import LoginImage from "../assets/Images/login.jpg"
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -9,6 +9,8 @@ import { TiTick } from "react-icons/ti";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
+import { useDropzone } from 'react-dropzone';
+import { FaFileAlt } from "react-icons/fa";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -126,7 +128,67 @@ const Login = () => {
   useEffect(() => {
     let token = Cookies.get('token');
     if (token) navigate("/");
-  }, [])
+  }, []);
+
+  const [noVideo, setNoVideo] = useState(false);
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isFocused, isDragAccept, isDragReject } = useDropzone({
+    accept: {
+      'image/*': [],         // Accept all image types
+      'application/pdf': [], // Accept PDF files
+      'application/msword': [], // Accept DOC files
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [], // Accept DOCX files
+    }
+  });
+
+  let classes = useMemo(() => (
+    'upload-box' +
+    (isFocused ? ' focused-style' : '') +
+    (isDragAccept ? ' accept-style' : '') +
+    (isDragReject ? ' reject-style' : '')
+  ), [isFocused, isDragAccept, isDragReject]);
+
+  async function handleUpload(e) {
+    e.preventDefault();
+    console.log(acceptedFiles);
+
+    if (acceptedFiles.length == 0) setNoVideo(true);
+    else {
+      setNoVideo(false);
+      const formData = new FormData();
+      const fileName = `${localStorage.getItem('email')}_${title}_${Date.now()}.mp4`; // Include video name in the filename
+      formData.append('video', acceptedFiles[0], fileName);
+      // formData.append('video', acceptedFiles[0]);
+      formData.append('title', title);
+      formData.append('desc', desc);
+      formData.append('fileName', fileName);
+      formData.append('name', localStorage.getItem('name'));
+
+      const response = await axios.post("http://localhost:3000/video/upload", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      // console.log(response.data);
+
+      if (response.status == 201) {
+        setTitle('');
+        setDesc('');
+
+        setIsSuccess(true);
+        // setTimeout(() => {
+        //   setIsSuccess(false);
+        //   navigate('/myvideos ');
+
+        // }, 2000);
+
+      }
+    }
+  }
 
   return <>
     <div className={visible ? "fade-in flex items-center justify-center min-h-screen bg-gradient opacity-0 relative" : "fade-out flex items-center justify-center min-h-screen bg-slate-100 relative"} >
@@ -306,8 +368,8 @@ const Login = () => {
                 ))}
               </div>
             </div>
-            <div className="py-2 mt-2">
-              <span className="mb-2 text-md">Time Availibility</span>
+            <div className="py-2 mt-10">
+              <span className="mb-10 text-md">Time Availibility</span>
               <div className='flex gap-3'>
                 <div className='flex items-end w-full gap-3'>
                   <span>from</span>
@@ -335,7 +397,7 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <div className="py-2 pb-10 mt-2">
+            <div className="py-2 pb-10 mt-10">
               <span className="mb-2 text-md">Password</span>
               <input
                 type="password"
@@ -347,6 +409,29 @@ const Login = () => {
                 required
               />
             </div>
+            <span className="mb-2 text-md">Document of Proof (Offer Letter/ Employment Contract/ Company ID Card/ Employment Verification Letter)</span>
+            <div {...getRootProps({ className: classes })}>
+              <input {...getInputProps()} />
+              {
+                isDragActive ?
+                  <p>Drop the document here ...</p> :
+                  noVideo ?
+                    <p className="red-alert">Select a document to upload! Drag & drop a document here, or click to select a document</p> :
+                    <p>Drag & drop a document here, or click to select a document</p>
+              }
+            </div>
+
+            {acceptedFiles.map(file => <div className="card" key={file.path}>
+              <div className="card-body d-flex justify-content-between align-items-center mb-12">
+                <div className="flex items-center gap-1 ">
+                  {/* <img src={FileIcon} /> */}
+                  <FaFileAlt className='text-xl' />
+                  <h6 className="card-title text-sm">{file.path}</h6>
+                </div>
+                <h6 className="card-text text-sm">size: {(file.size / (1024 * 1024)).toFixed(2)} mb</h6>
+              </div>
+            </div>
+            )}
             <button
               className="w-full bg-teal-blue text-white p-2 rounded-lg mb-6 border "
               type='submit'

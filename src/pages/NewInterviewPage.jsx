@@ -13,7 +13,13 @@ export default function NewInterviewPage() {
   const [batch, setBatch] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  c
+  const getBatch = async () => {
+    const response = await axios.post(`http://localhost:3000/batches/get-batch`, { batchId: Cookies.get('batchId'), email: Cookies.get('email') });
+    response.data.tableData = JSON.parse(response.data.tableData);
+    response.data.schedule = JSON.parse(response.data.schedule);
+    setBatch(response.data);
+    console.log(response);
+  }
 
   const acceptBatch = async () => {
     const response = await axios.post(`http://localhost:3000/batches/accept-batch`, { batchId: Cookies.get('batchId'), email: Cookies.get('email'), schedule: JSON.stringify(batch.schedule) });
@@ -78,7 +84,7 @@ export default function NewInterviewPage() {
       </div>
 
       <div className="container">
-        <p className="text-xl mt-14 font-semibold">Candidates ({batch.tableData.length})</p>
+        <p className="text-xl mt-14 font-semibold">Candidates ({batch.tableData?.length})</p>
 
         <div className="overflow-hidden rounded-lg border border-slate-300 mt-3">
           <table className="text-left w-full">
