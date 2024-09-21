@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 const Dashboard = () => {
   const [realTimeData, setRealTimeData] = useState([]);
   const [metrics, setMetrics] = useState({
-    totalUsers: 0,
-    activeBatches: 0,
-    completedBatches: 0,
+    totalUsers: 15,
+    activeBatches: 12,
+    completedBatches: 1,
   });
   const navigate = useNavigate();
 

@@ -10,7 +10,7 @@ import { Home } from './pages/Home';
   import ManageProfile from './components/ManageProfile';
   import Formdetails from './pages/Formdetails';
   import CSVTable from "./components/CSVTable";
-  import Aptitudexam from "./pages/Aptitudexam"
+
 
 
 
@@ -20,9 +20,10 @@ import { Home } from './pages/Home';
     Route,
   
   } from "react-router-dom"
-import Interviewer_Home from './pages/Interviewer_Home';
-import Logins from './pages/Logins';
+
 import Dashboard from './components/Dashboard';
+import BatchDetails from './components/BatchDetails';
+import Footer from './components/footer';
 
 
 
@@ -50,12 +51,13 @@ import Dashboard from './components/Dashboard';
             <Route exact path="/formdetails" element={<Formdetails />} />
             <Route exact path="/dashboard" element={<Dashboard />} />
             <Route exact path="/csv-table" element={<CSVTable />} />
-            <Route exact path="/aptiexam" element={<Aptitudexam />} />
+            <Route exact path="/batchDetails" element={<BatchDetails />} />
             <Route path="/form" element={isAuthenticated ? <BatchForm /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/card" element={isAuthenticated ? <BatchCard /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/profile" element={isAuthenticated ? <ManageProfile /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
           </Routes>
+          <Footer/>
         </div>
       </Router>
     );

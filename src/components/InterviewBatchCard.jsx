@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { CgProfile} from "react-icons/cg";
+import { GrDomain } from "react-icons/gr";
+import { BsFillCalendarDateFill } from "react-icons/bs";
+import { GiSkills } from "react-icons/gi";
+import { FaLaptopCode } from "react-icons/fa6";
 import InterviewIcon from "../assets/interview-icon.png";
 
 const InterviewBatchCard = () => {
@@ -39,7 +44,7 @@ const InterviewBatchCard = () => {
   }
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 ">
+    <div className="flex flex-wrap justify-center gap-10 ">
       <h2 className="text-3xl font-bold text-center my-8">Interview Batches</h2>
       <div className="w-full mb-8"></div>
       {interviewBatches.length === 0 && (
@@ -48,7 +53,7 @@ const InterviewBatchCard = () => {
       {interviewBatches.map((batch, index) => (
         <div
           key={index}
-          className="max-w-xs bg-white hover:bg-light-blue cursor-pointer rounded overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+          className="max-w-xs  bg-white hover:bg-light-blue cursor-pointer rounded overflow-hidden shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
         >
           <a href="#">
             <img
@@ -59,13 +64,30 @@ const InterviewBatchCard = () => {
           </a>
           <div className="py-5 px-2">
             <a href="#">
-              <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">{batch.companyName}</h5>
+              <h5 className="mb-2 text-xl font-bold tracking-tight text-gray-900">{batch.companyName} (Total Candidate {batch.candidates.length})</h5>
             </a>
-            <p className="mb-1 font-normal text-sm text-gray-700">Total Candidates Required: {batch.totalCandidatesRequired}</p>
-            <p className="mb-1 font-normal text-sm text-gray-700">Domains: {batch.domains}</p>
-            <p className="mb-1 font-normal text-sm text-gray-700">Skills: {batch.skills.join(", ")}</p>
-            <p className="mb-1 font-normal text-sm text-gray-700">Interview Types: {batch.interviewTypes.join(", ")}</p>
-            <p className="mb-1 font-normal text-sm text-gray-700">Deadline: {new Date(batch.deadline).toLocaleDateString()}</p>
+            <p className="flex items-center mb-1 font-normal text-sm text-gray-700">
+  <CgProfile className="mr-2" /> Total Candidates Required: {batch.totalCandidatesRequired}
+</p>
+
+            <p className="flex items-center mb-1 font-normal text-sm text-gray-700"><GrDomain className="mr-2" />Domains: {batch.domains}</p>
+            <p className="flex flex-col mb-1 font-normal text-sm text-gray-700">
+  <span className="flex items-center mb-1">
+    <GiSkills className="mr-2" />
+    <span>Skills:</span>
+  </span>
+  <div className="flex flex-wrap gap-1">
+    {batch.skills.map((skill, index) => (
+      <span key={index} className="bg-slate-200 rounded-3xl px-2 py-1 text-sm">
+        {skill}
+      </span>
+    ))}
+  </div>
+</p>
+
+
+            <p className="flex items-center mb-1 font-normal text-sm text-gray-700"><FaLaptopCode className="mr-2"  />Interview Types: {batch.interviewTypes.join(", ")}</p>
+            <p className="flex items-center mb-1 font-normal text-sm text-gray-700"><BsFillCalendarDateFill className="mr-2"  />Deadline: {new Date(batch.deadline).toLocaleDateString()}</p>
         
             <button
               onClick={() => navigate("/csv-table", { state: { batch } })}

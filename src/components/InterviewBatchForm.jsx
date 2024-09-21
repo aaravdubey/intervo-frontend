@@ -107,8 +107,8 @@ const InterviewBatchForm = () => {
 
   const interviewTypes = [
     { value: "Aptitude", label: "Aptitude" },
-    { value: "Coding", label: "Coding" },
-    { value: "Group Discussion", label: "Group Discussion" },
+    { value: "Interview", label: "Interview" },
+    // { value: "Group Discussion", label: "Group Discussion" },
   ];
 
   return (
